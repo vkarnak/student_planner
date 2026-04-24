@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
-import '../providers/schedule_provider.dart';
 import '../widgets/task_tile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final taskProvider = Provider.of<TaskProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Today")),
+      appBar: AppBar(title: const Text("Today")),
 
       body: taskProvider.isLoading
           ? Center(child: CircularProgressIndicator())
@@ -62,14 +61,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
 
-                  onDismissed: (_) {
-                    taskProvider.deleteTask(task.id!);
+                  onDismissed: (_) async {
+                    await taskProvider.deleteTask(task.id!);
+
+                    if (!mounted) return;
 
                     ScaffoldMessenger.of(
                       context,
                     ).showSnackBar(SnackBar(content: Text("Task deleted")));
                   },
-
                   background: Container(
                     color: Colors.red,
                     alignment: Alignment.centerRight,

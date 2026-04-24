@@ -6,11 +6,9 @@ class NotificationService {
   static Future init() async {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const settings = InitializationSettings(
-      android: android,
-    );
+    const settings = InitializationSettings(android: android);
 
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
   }
 
   static Future show(String title, String body) async {
@@ -21,9 +19,7 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(
-      android: androidDetails,
-    );
+    const details = NotificationDetails(android: androidDetails);
 
     await _plugin.show(
       id: 0,

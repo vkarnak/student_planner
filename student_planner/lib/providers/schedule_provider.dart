@@ -5,18 +5,20 @@ import '../services/notification_service.dart';
 import '../services/ai_service.dart';
 
 class ScheduleProvider extends ChangeNotifier {
-
   List<Task> items = [];
   bool isLoading = false;
 
-  // 📅 LOAD SCHEDULE
   Future<void> loadSchedule() async {
     isLoading = true;
     notifyListeners();
 
     try {
-      items = await ScheduleService.getSchedule();
+      final data = await ScheduleService.getSchedule();
+      items = data
+          .map((e) => Task.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
+      debugPrint(e.toString());
       items = [];
     }
 
@@ -24,42 +26,45 @@ class ScheduleProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 🔔 REMINDERS
   Future<void> checkReminders() async {
     for (var task in items) {
-      if (task.deadline != null &&
-          task.deadline!.difference(DateTime.now()).inHours <= 1) {
+      if (task.deadline != null && task.deadline!.isNotEmpty) {
+        final deadline = DateTime.parse(task.deadline!);
 
-        await NotificationService.show(
-          "Upcoming task",
-          task.title,
-        );
+        if (deadline.difference(DateTime.now()).inHours <= 1) {
+          await NotificationService.show("Upcoming task", task.title);
+        }
       }
     }
   }
 
-  // 🤖 AI OPTIMIZE (локально через AIScheduler или API)
   Future<void> optimize() async {
     isLoading = true;
     notifyListeners();
 
     try {
-      items = await AiService.optimize(); // если backend
-    } catch (e) {}
+      final data = await AiService.optimize();
+      items = data
+          .map((e) => Task.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
 
     isLoading = false;
     notifyListeners();
   }
 
-  // 🧠 AUTO DISTRIBUTE
   Future<void> autoDistribute() async {
     isLoading = true;
     notifyListeners();
 
     try {
       await AiService.autoDistribute();
-      await loadSchedule(); // 🔥 обновляем после
-    } catch (e) {}
+      await loadSchedule();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
 
     isLoading = false;
     notifyListeners();

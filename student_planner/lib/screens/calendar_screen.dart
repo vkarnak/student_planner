@@ -27,11 +27,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final provider = Provider.of<ScheduleProvider>(context);
 
     final filtered = provider.items.where((task) {
-      if (task.deadline == null) return false;
+      if (task.deadline == null || task.deadline!.isEmpty) return false;
 
-      return task.deadline!.year == selectedDate.year &&
-          task.deadline!.month == selectedDate.month &&
-          task.deadline!.day == selectedDate.day;
+      final deadline = DateTime.parse(task.deadline!);
+
+      return deadline.year == selectedDate.year &&
+          deadline.month == selectedDate.month &&
+          deadline.day == selectedDate.day;
     }).toList();
 
     return Scaffold(

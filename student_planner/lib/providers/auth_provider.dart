@@ -4,7 +4,6 @@ import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
-
   String? _token;
   String? _error;
 
@@ -17,7 +16,6 @@ class AuthProvider extends ChangeNotifier {
 
   // 🔐 LOGIN
   Future<bool> login(String email, String password) async {
-
     _setLoading(true);
     _error = null;
 
@@ -36,11 +34,9 @@ class AuthProvider extends ChangeNotifier {
       await prefs.setString('token', t);
 
       return true;
-
     } catch (e) {
       _error = "Server error";
       return false;
-
     } finally {
       _setLoading(false);
     }
@@ -60,7 +56,6 @@ class AuthProvider extends ChangeNotifier {
 
   // 📝 REGISTER
   Future<bool> register(String email, String password, String name) async {
-
     _setLoading(true);
     _error = null;
 
@@ -72,12 +67,11 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      return true;
-
+      // 🔥 АВТОЛОГИН
+      return await login(email, password);
     } catch (e) {
       _error = "Server error";
       return false;
-
     } finally {
       _setLoading(false);
     }
