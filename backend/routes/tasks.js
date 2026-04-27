@@ -34,6 +34,42 @@ router.post('/', auth, (req, res) => {
   );
 });
 
+// ✏️ UPDATE TASK
+router.put('/:id', auth, (req, res) => {
+  const t = req.body;
+
+  db.run(`
+    UPDATE tasks SET
+      title = ?,
+      description = ?,
+      deadline = ?,
+      duration = ?,
+      priority = ?,
+      difficulty = ?,
+      status = ?
+    WHERE id = ? AND user_id = ?
+  `,
+  [
+    t.title,
+    t.description,
+    t.deadline,
+    t.duration,
+    t.priority,
+    t.difficulty,
+    t.status,
+    req.params.id,
+    req.user.id
+  ],
+  function (err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.json({ changes: this.changes });
+  });
+});
+
 router.delete('/:id', auth, (req, res) => {
   db.run(
     "DELETE FROM tasks WHERE id=? AND user_id=?",

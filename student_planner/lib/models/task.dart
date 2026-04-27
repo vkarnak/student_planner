@@ -43,11 +43,11 @@ class Task {
     return {
       'id': id,
       'title': title,
-      'description': description,
-      'deadline': deadline,
-      'duration': duration,
+      'description': description ?? "",
+      'deadline': deadline ?? "",
+      'duration': duration ?? 0,
       'priority': priority,
-      'difficulty': difficulty,
+      'difficulty': difficulty ?? 1,
       'status': status,
       'created_at': createdAt?.toIso8601String(),
     };

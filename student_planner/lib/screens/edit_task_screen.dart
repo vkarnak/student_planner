@@ -13,6 +13,7 @@ class EditTaskScreen extends StatefulWidget {
 }
 
 class _EditTaskScreenState extends State<EditTaskScreen> {
+  bool _isInit = false;
   final title = TextEditingController();
   final description = TextEditingController();
 
@@ -29,20 +30,24 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
+    if (!_isInit) {
+      originalTask = ModalRoute.of(context)!.settings.arguments as Task;
 
-    originalTask = ModalRoute.of(context)!.settings.arguments as Task;
+      title.text = originalTask.title;
+      description.text = originalTask.description ?? "";
 
-    title.text = originalTask.title;
-    description.text = originalTask.description ?? "";
+      if (originalTask.deadline != null) {
+        selectedDeadline = DateTime.parse(originalTask.deadline!);
+      }
 
-    if (originalTask.deadline != null) {
-      selectedDeadline = DateTime.parse(originalTask.deadline!);
+      selectedDuration = Duration(minutes: originalTask.duration ?? 60);
+      priority = originalTask.priority;
+      difficulty = originalTask.difficulty ?? 2;
+
+      _isInit = true;
     }
 
-    selectedDuration = Duration(minutes: originalTask.duration ?? 60);
-    priority = originalTask.priority;
-    difficulty = originalTask.difficulty ?? 2;
+    super.didChangeDependencies();
   }
 
   // 📅 дата
