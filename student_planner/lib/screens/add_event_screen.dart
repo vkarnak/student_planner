@@ -66,12 +66,15 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     final event = Event(title: title.text, date: dateTime.toIso8601String());
 
-    // 🔥 send request
-    await provider.addEvent(event);
+    final success = await provider.addEvent(event);
 
     setState(() => isLoading = false);
 
-    // 🔥 success → back
+    if (!success) {
+      setState(() => error = "Failed to create event");
+      return;
+    }
+
     Navigator.pop(context);
   }
 

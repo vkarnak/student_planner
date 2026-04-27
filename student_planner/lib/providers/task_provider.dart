@@ -3,10 +3,11 @@ import '../models/task.dart';
 import '../services/task_service.dart';
 
 class TaskProvider extends ChangeNotifier {
-
   List<Task> tasks = [];
 
   bool isLoading = false;
+
+  Object? get upcoming => null;
 
   // 🔥 загрузка задач
   Future<void> loadTasks() async {

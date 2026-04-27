@@ -2,7 +2,6 @@ import 'api_service.dart';
 import '../models/event.dart';
 
 class EventService {
-
   // 📅 GET EVENTS
   static Future<List<Event>> getEvents() async {
     final data = await ApiService.getEvents();
@@ -11,8 +10,8 @@ class EventService {
   }
 
   // ➕ ADD EVENT
-  static Future<void> addEvent(Event event) async {
-    await ApiService.createEvent(event.toJson());
+  static Future<bool> addEvent(Event event) async {
+    return await ApiService.createEvent(event.toJson());
   }
 
   // ✏️ UPDATE EVENT

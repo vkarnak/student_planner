@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:student_planner/providers/event_provider.dart';
+import 'package:student_planner/screens/edit_task_screen.dart';
+import 'package:student_planner/screens/schedule_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // 🔐 Providers
 import 'providers/auth_provider.dart';
@@ -39,6 +43,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()..tryAutoLogin()),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => ScheduleProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => SuggestionProvider()),
@@ -55,19 +60,23 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
 
-            // 🔥 лучше так (чтобы не было мигания)
             home: auth.token == null ? LoginScreen() : HomeScreen(),
 
             routes: {
               "/home": (_) => HomeScreen(),
               "/register": (_) => RegisterScreen(),
               "/add": (_) => AddTaskScreen(),
+              "/edit": (_) => EditTaskScreen(),
               "/add_event": (_) => AddEventScreen(),
               "/edit_event": (_) => EditEventScreen(),
+              "/schedule": (_) => ScheduleScreen(),
               "/calendar": (_) => CalendarScreen(),
               "/profile": (_) => ProfileScreen(),
               "/suggestions": (_) => SuggestionScreen(),
             },
+
+            supportedLocales: [Locale('ru', 'RU')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
           );
         },
       ),

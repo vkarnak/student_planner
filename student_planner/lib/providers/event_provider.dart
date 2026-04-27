@@ -3,7 +3,6 @@ import '../models/event.dart';
 import '../services/event_service.dart';
 
 class EventProvider extends ChangeNotifier {
-
   List<Event> events = [];
   bool isLoading = false;
 
@@ -21,9 +20,15 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addEvent(Event event) async {
-    await EventService.addEvent(event);
-    await loadEvents();
+  Future<bool> addEvent(Event event) async {
+    final success = await EventService.addEvent(event);
+
+    if (success) {
+      await loadEvents();
+      return true;
+    }
+
+    return false;
   }
 
   Future<void> updateEvent(Event event) async {

@@ -84,12 +84,19 @@ class ApiService {
     return [];
   }
 
-  static Future<void> createEvent(Map data) async {
-    await http.post(
+  static Future<bool> createEvent(Map data) async {
+    final res = await http.post(
       Uri.parse("$baseUrl/events"),
       headers: headers,
       body: jsonEncode(data),
     );
+
+    if (res.statusCode == 200) {
+      return true;
+    } else {
+      print("EVENT ERROR: ${res.body}");
+      return false;
+    }
   }
 
   static Future<void> updateEvent(Map data) async {
@@ -107,7 +114,7 @@ class ApiService {
   // 🧠 SUGGESTIONS
   static Future<List<dynamic>> getSuggestions() async {
     final res = await http.get(
-      Uri.parse("$baseUrl/suggestions"),
+      Uri.parse("$baseUrl/ai/suggestions"),
       headers: headers,
     );
 

@@ -21,7 +21,7 @@ class Task {
     this.createdAt,
   });
 
-  // Convert JSON to Task object
+  // 📥 FROM JSON
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: json['id'],
@@ -32,13 +32,13 @@ class Task {
       priority: json['priority'] ?? 1,
       difficulty: json['difficulty'],
       status: json['status'] ?? 'pending',
-      createdAt: json['created_at'] != null 
-        ? DateTime.parse(json['created_at']) 
-        : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
     );
   }
 
-  // Convert Task object to JSON
+  // 📤 TO JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -53,7 +53,7 @@ class Task {
     };
   }
 
-  // Create a copy of Task with modified fields
+  // 🔁 COPY
   Task copyWith({
     int? id,
     String? title,
@@ -77,4 +77,42 @@ class Task {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  // =========================
+  // 💡 УДОБНЫЕ ГЕТТЕРЫ
+  // =========================
+
+  /// 📅 Преобразует строку в DateTime
+  DateTime? get deadlineDate {
+    if (deadline == null) return null;
+    return DateTime.tryParse(deadline!);
+  }
+
+  /// 📅 Формат dd.MM.yyyy
+  String get formattedDeadline {
+    if (deadlineDate == null) return "No deadline";
+
+    final d = deadlineDate!;
+    return "${d.day.toString().padLeft(2, '0')}."
+        "${d.month.toString().padLeft(2, '0')}."
+        "${d.year}";
+  }
+
+  /// ⏱ Часы и минуты
+  String get formattedDuration {
+    if (duration == null) return "-";
+
+    final h = duration! ~/ 60;
+    final m = duration! % 60;
+
+    return "${h}h ${m}m";
+  }
+
+  int get daysLeft {
+    if (deadlineDate == null) return 999;
+    return deadlineDate!.difference(DateTime.now()).inDays;
+  }
+
+  /// ✅ Проверка статуса
+  bool get isDone => status == "done";
 }

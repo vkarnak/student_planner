@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 
@@ -8,6 +10,7 @@ class TaskTile extends StatelessWidget {
 
   const TaskTile(this.task, {super.key});
 
+  // 🎨 цвет по приоритету
   Color getColor() {
     switch (task.priority) {
       case 4:
@@ -21,70 +24,103 @@ class TaskTile extends StatelessWidget {
     }
   }
 
+  // 📅 формат даты
+  String formatDate(String? isoDate) {
+    if (isoDate == null || isoDate.isEmpty) return "-";
+    final date = DateTime.parse(isoDate);
+    return DateFormat('dd.MM.yyyy').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(radius: 6, backgroundColor: getColor()),
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: ListTile(
+        leading: CircleAvatar(radius: 6, backgroundColor: getColor()),
 
-      title: Text(task.title),
-
-      subtitle: Text("Due: ${task.deadline}"),
-
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // ✏️ EDIT
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.pushNamed(context, "/edit", arguments: task);
-            },
+        // 📌 TITLE
+        title: Text(
+          task.title,
+          style: TextStyle(
+            decoration: task.status == "done"
+                ? TextDecoration.lineThrough
+                : null,
+            color: task.status == "done" ? Colors.grey : Colors.black,
           ),
+        ),
 
-          // ❌ DELETE
-          IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            onPressed: () async {
-              final confirm = await showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Text("Delete task"),
-                  content: Text("Are you sure?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: Text("Delete"),
-                    ),
-                  ],
-                ),
-              );
+        // 📅 DEADLINE
+        subtitle: Text(
+          "Due: ${formatDate(task.deadline)}",
+          style: TextStyle(color: Colors.grey[600]),
+        ),
 
-              if (confirm == true) {
-                Provider.of<TaskProvider>(
+        // 🔧 ACTIONS
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ✏️ EDIT
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.pushNamed(context, "/edit", arguments: task);
+              },
+            ),
+
+            // ❌ DELETE
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                final confirm = await showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text("Delete task"),
+                    content: Text("Are you sure?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  Provider.of<TaskProvider>(
+                    context,
+                    listen: false,
+                  ).deleteTask(task.id!);
+                }
+              },
+            ),
+
+            // ✅ DONE / UNDONE
+            IconButton(
+              icon: Icon(
+                task.status == "done"
+                    ? Icons.check_circle
+                    : Icons.check_circle_outline,
+                color: task.status == "done" ? Colors.green : null,
+              ),
+              onPressed: () {
+                final provider = Provider.of<TaskProvider>(
                   context,
                   listen: false,
-                ).deleteTask(task.id!);
-              }
-            },
-          ),
+                );
 
-          // ✅ DONE / UNDONE
-          IconButton(
-            icon: Icon(
-              task.status == "done"
-                  ? Icons.check_circle
-                  : Icons.check_circle_outline,
-              color: task.status == "done" ? Colors.green : null,
+                final updatedTask = task.copyWith(
+                  status: task.status == "done" ? "pending" : "done",
+                );
+
+                provider.updateTask(updatedTask);
+              },
             ),
-            onPressed: () {
-              // дальше добавим toggle
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
