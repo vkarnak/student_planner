@@ -12,12 +12,16 @@ class AddEventScreen extends StatefulWidget {
 
 class _AddEventScreenState extends State<AddEventScreen> {
   final title = TextEditingController();
+  final description = TextEditingController();
+
   DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
 
   String? error;
   bool isLoading = false;
 
+  // 📅 DATE
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -31,21 +35,57 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  Future<void> pickTime() async {
+  // ⏰ START
+  Future<void> pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
 
     if (picked != null) {
-      setState(() => selectedTime = picked);
+      setState(() => startTime = picked);
+    }
+  }
+
+  // ⏰ END
+  Future<void> pickEndTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (picked != null) {
+      setState(() => endTime = picked);
     }
   }
 
   void createEvent() async {
-    // 🔥 validate
-    if (title.text.isEmpty || selectedDate == null || selectedTime == null) {
+    if (title.text.isEmpty ||
+        selectedDate == null ||
+        startTime == null ||
+        endTime == null) {
       setState(() => error = "Fill all fields");
+      return;
+    }
+
+    final start = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      startTime!.hour,
+      startTime!.minute,
+    );
+
+    final end = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      endTime!.hour,
+      endTime!.minute,
+    );
+
+    if (end.isBefore(start)) {
+      setState(() => error = "End time must be after start time");
       return;
     }
 
@@ -56,16 +96,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     final provider = Provider.of<EventProvider>(context, listen: false);
 
-    final dateTime = DateTime(
-      selectedDate!.year,
-      selectedDate!.month,
-      selectedDate!.day,
-      selectedTime!.hour,
-      selectedTime!.minute,
+    final event = Event(
+      title: title.text,
+      start: start,
+      end: end,
+      description: description.text,
     );
-
-    final event = Event(title: title.text, date: dateTime.toIso8601String());
-
     final success = await provider.addEvent(event);
 
     setState(() => isLoading = false);
@@ -77,6 +113,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     Navigator.pop(context);
   }
+
+  // ================= UI =================
 
   @override
   Widget build(BuildContext context) {
@@ -91,31 +129,44 @@ class _AddEventScreenState extends State<AddEventScreen> {
               controller: title,
               decoration: InputDecoration(labelText: "Title"),
             ),
-
             SizedBox(height: 10),
 
-            Row(
-              children: [
-                Text(
-                  selectedDate == null
-                      ? "No date"
-                      : "${selectedDate!.toLocal()}".split(' ')[0],
-                ),
-                Spacer(),
-                TextButton(onPressed: pickDate, child: Text("Pick date")),
-              ],
+            TextField(
+              controller: description,
+              decoration: InputDecoration(labelText: "Description"),
+              maxLines: 2,
             ),
 
-            Row(
-              children: [
-                Text(
-                  selectedTime == null
-                      ? "No time"
-                      : selectedTime!.format(context),
-                ),
-                Spacer(),
-                TextButton(onPressed: pickTime, child: Text("Pick time")),
-              ],
+            // 📅 DATE
+            ListTile(
+              title: Text("Date"),
+              subtitle: Text(
+                selectedDate == null
+                    ? "Not selected"
+                    : "${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}",
+              ),
+              trailing: TextButton(onPressed: pickDate, child: Text("Pick")),
+            ),
+
+            // ⏰ START
+            ListTile(
+              title: Text("Start"),
+              subtitle: Text(
+                startTime == null ? "Not selected" : startTime!.format(context),
+              ),
+              trailing: TextButton(
+                onPressed: pickStartTime,
+                child: Text("Pick"),
+              ),
+            ),
+
+            // ⏰ END
+            ListTile(
+              title: Text("End"),
+              subtitle: Text(
+                endTime == null ? "Not selected" : endTime!.format(context),
+              ),
+              trailing: TextButton(onPressed: pickEndTime, child: Text("Pick")),
             ),
 
             SizedBox(height: 20),

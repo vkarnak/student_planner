@@ -40,4 +40,10 @@ class EventProvider extends ChangeNotifier {
     await EventService.deleteEvent(id);
     await loadEvents();
   }
+
+  List<Event> get upcoming {
+    final now = DateTime.now();
+    return events.where((e) => e.start.isAfter(now)).toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+  }
 }

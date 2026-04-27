@@ -12,28 +12,42 @@ class EditEventScreen extends StatefulWidget {
 
 class _EditEventScreenState extends State<EditEventScreen> {
   late TextEditingController title;
+  late TextEditingController description;
 
   DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
 
   bool isLoading = false;
   String? error;
 
   late Event original;
+  bool _isInit = false;
 
   @override
   void didChangeDependencies() {
+    if (!_isInit) {
+      original = ModalRoute.of(context)!.settings.arguments as Event;
+
+      title = TextEditingController(text: original.title);
+      description = TextEditingController(text: original.description ?? "");
+
+      selectedDate = original.start;
+
+      startTime = TimeOfDay(
+        hour: original.start.hour,
+        minute: original.start.minute,
+      );
+
+      endTime = TimeOfDay(hour: original.end.hour, minute: original.end.minute);
+
+      _isInit = true;
+    }
+
     super.didChangeDependencies();
-
-    original = ModalRoute.of(context)!.settings.arguments as Event;
-
-    title = TextEditingController(text: original.title);
-
-    final dt = DateTime.parse(original.date);
-    selectedDate = dt;
-    selectedTime = TimeOfDay(hour: dt.hour, minute: dt.minute);
   }
 
+  // 📅 DATE
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -47,20 +61,57 @@ class _EditEventScreenState extends State<EditEventScreen> {
     }
   }
 
-  Future<void> pickTime() async {
+  // ⏰ START
+  Future<void> pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
-      initialTime: selectedTime!,
+      initialTime: startTime!,
     );
 
     if (picked != null) {
-      setState(() => selectedTime = picked);
+      setState(() => startTime = picked);
+    }
+  }
+
+  // ⏰ END
+  Future<void> pickEndTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: endTime!,
+    );
+
+    if (picked != null) {
+      setState(() => endTime = picked);
     }
   }
 
   void save() async {
-    if (title.text.isEmpty || selectedDate == null || selectedTime == null) {
+    if (title.text.isEmpty ||
+        selectedDate == null ||
+        startTime == null ||
+        endTime == null) {
       setState(() => error = "Fill all fields");
+      return;
+    }
+
+    final start = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      startTime!.hour,
+      startTime!.minute,
+    );
+
+    final end = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      endTime!.hour,
+      endTime!.minute,
+    );
+
+    if (end.isBefore(start)) {
+      setState(() => error = "End time must be after start time");
       return;
     }
 
@@ -69,18 +120,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
       error = null;
     });
 
-    final dateTime = DateTime(
-      selectedDate!.year,
-      selectedDate!.month,
-      selectedDate!.day,
-      selectedTime!.hour,
-      selectedTime!.minute,
-    );
-
     final updated = Event(
       id: original.id,
       title: title.text,
-      date: dateTime.toIso8601String(),
+      start: start,
+      end: end,
+      description: description.text,
     );
 
     await Provider.of<EventProvider>(
@@ -92,6 +137,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
     Navigator.pop(context);
   }
+
+  // ================= UI =================
 
   @override
   Widget build(BuildContext context) {
@@ -109,20 +156,42 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
             SizedBox(height: 10),
 
-            Row(
-              children: [
-                Text("${selectedDate!.toLocal()}".split(' ')[0]),
-                Spacer(),
-                TextButton(onPressed: pickDate, child: Text("Change date")),
-              ],
+            TextField(
+              controller: description,
+              decoration: InputDecoration(labelText: "Description"),
+              maxLines: 2,
             ),
 
-            Row(
-              children: [
-                Text(selectedTime!.format(context)),
-                Spacer(),
-                TextButton(onPressed: pickTime, child: Text("Change time")),
-              ],
+            // 📅 DATE
+            ListTile(
+              title: Text("Date"),
+              subtitle: Text(
+                selectedDate == null
+                    ? "Not selected"
+                    : "${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}",
+              ),
+              trailing: TextButton(onPressed: pickDate, child: Text("Pick")),
+            ),
+
+            // ⏰ START
+            ListTile(
+              title: Text("Start"),
+              subtitle: Text(
+                startTime == null ? "Not selected" : startTime!.format(context),
+              ),
+              trailing: TextButton(
+                onPressed: pickStartTime,
+                child: Text("Pick"),
+              ),
+            ),
+
+            // ⏰ END
+            ListTile(
+              title: Text("End"),
+              subtitle: Text(
+                endTime == null ? "Not selected" : endTime!.format(context),
+              ),
+              trailing: TextButton(onPressed: pickEndTime, child: Text("Pick")),
             ),
 
             SizedBox(height: 20),

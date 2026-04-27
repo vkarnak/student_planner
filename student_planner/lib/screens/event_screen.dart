@@ -39,10 +39,12 @@ class _EventScreenState extends State<EventScreen> {
                   title: Text(e.title),
 
                   subtitle: Text(
-                    DateTime.parse(
-                      e.date,
-                    ).toLocal().toString().substring(0, 16),
+                    "${formatDate(e.start)} • ${formatTime(e.start)} - ${formatTime(e.end)}",
                   ),
+
+                  onTap: () {
+                    Navigator.pushNamed(context, "/edit_event", arguments: e);
+                  },
 
                   trailing: IconButton(
                     icon: Icon(Icons.delete, color: Colors.red),
@@ -81,5 +83,15 @@ class _EventScreenState extends State<EventScreen> {
               },
             ),
     );
+  }
+
+  // ================= FORMAT =================
+
+  String formatDate(DateTime d) {
+    return "${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}";
+  }
+
+  String formatTime(DateTime d) {
+    return "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
   }
 }

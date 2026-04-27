@@ -16,9 +16,14 @@ router.post('/', auth, (req, res) => {
   const e = req.body;
 
   db.run(
-    "INSERT INTO events (title, date, time, user_id) VALUES (?, ?, ?, ?)",
-    [e.title, e.date, e.time, req.user.id],
-    function () {
+    "INSERT INTO events (title, start, end, description, user_id) VALUES (?, ?, ?, ?, ?)",
+    [e.title, e.start, e.end, e.description, req.user.id],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+      }
+
       res.json({ id: this.lastID });
     }
   );
@@ -28,9 +33,14 @@ router.put('/:id', auth, (req, res) => {
   const e = req.body;
 
   db.run(
-    "UPDATE events SET title=?, date=?, time=? WHERE id=? AND user_id=?",
-    [e.title, e.date, e.time, req.params.id, req.user.id],
-    function () {
+    "UPDATE events SET title=?, start=?, end=?, description=? WHERE id=? AND user_id=?",
+    [e.title, e.start, e.end, e.description, req.params.id, req.user.id],
+    function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+      }
+
       res.json({ changes: this.changes });
     }
   );

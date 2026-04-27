@@ -49,8 +49,9 @@ db.serialize(() => {
   CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    date TEXT NOT NULL,
-    time TEXT NOT NULL,
+    start TEXT NOT NULL,
+    end TEXT NOT NULL,
+    description TEXT,
     user_id INTEGER NOT NULL,
     schedule_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
