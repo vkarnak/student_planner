@@ -14,12 +14,28 @@ class _AddEventScreenState extends State<AddEventScreen> {
   final title = TextEditingController();
   final description = TextEditingController();
 
+  String selectedColor = "blue";
+
   DateTime? selectedDate;
   TimeOfDay? startTime;
   TimeOfDay? endTime;
 
   String? error;
   bool isLoading = false;
+
+  // 🎨 EVENT COLOR
+  Color getEventColor(String color) {
+    switch (color) {
+      case "red":
+        return Colors.red;
+      case "green":
+        return Colors.green;
+      case "orange":
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
+  }
 
   // 📅 DATE
   Future<void> pickDate() async {
@@ -59,6 +75,28 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
+  // 🎨 COLOR PICKER
+  Widget _colorDot(String color) {
+    return GestureDetector(
+      onTap: () {
+        setState(() => selectedColor = color);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 6),
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          color: getEventColor(color),
+          shape: BoxShape.circle,
+          border: selectedColor == color
+              ? Border.all(color: Colors.black, width: 2)
+              : null,
+        ),
+      ),
+    );
+  }
+
+  // 💾 CREATE EVENT
   void createEvent() async {
     if (title.text.isEmpty ||
         selectedDate == null ||
@@ -101,7 +139,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
       start: start,
       end: end,
       description: description.text,
+      color: selectedColor,
     );
+
     final success = await provider.addEvent(event);
 
     setState(() => isLoading = false);
@@ -121,7 +161,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("New Event")),
 
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
@@ -129,6 +169,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
               controller: title,
               decoration: InputDecoration(labelText: "Title"),
             ),
+
             SizedBox(height: 10),
 
             TextField(
@@ -136,6 +177,21 @@ class _AddEventScreenState extends State<AddEventScreen> {
               decoration: InputDecoration(labelText: "Description"),
               maxLines: 2,
             ),
+
+            SizedBox(height: 12),
+
+            // 🎨 COLOR
+            Row(
+              children: [
+                Text("Color: "),
+                _colorDot("blue"),
+                _colorDot("red"),
+                _colorDot("green"),
+                _colorDot("orange"),
+              ],
+            ),
+
+            SizedBox(height: 12),
 
             // 📅 DATE
             ListTile(

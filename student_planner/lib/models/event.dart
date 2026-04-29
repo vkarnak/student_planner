@@ -4,6 +4,7 @@ class Event {
   final DateTime start;
   final DateTime end;
   final String? description;
+  final String color;
 
   Event({
     this.id,
@@ -11,6 +12,7 @@ class Event {
     required this.start,
     required this.end,
     this.description,
+    this.color = "blue",
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -20,16 +22,17 @@ class Event {
       start: DateTime.parse(json['start']),
       end: DateTime.parse(json['end']),
       description: json['description'],
+      color: json['color'] ?? "blue",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
       "title": title,
       "start": start.toIso8601String(),
       "end": end.toIso8601String(),
       "description": description,
+      "color": color,
     };
   }
 }

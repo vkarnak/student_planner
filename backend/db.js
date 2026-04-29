@@ -52,6 +52,7 @@ db.serialize(() => {
     start TEXT NOT NULL,
     end TEXT NOT NULL,
     description TEXT,
+    color TEXT DEFAULT 'blue',
     user_id INTEGER NOT NULL,
     schedule_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

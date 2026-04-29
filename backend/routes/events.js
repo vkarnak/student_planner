@@ -15,35 +15,25 @@ router.get('/', auth, (req, res) => {
 router.post('/', auth, (req, res) => {
   const e = req.body;
 
-  db.run(
-    "INSERT INTO events (title, start, end, description, user_id) VALUES (?, ?, ?, ?, ?)",
-    [e.title, e.start, e.end, e.description, req.user.id],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: err.message });
-      }
-
-      res.json({ id: this.lastID });
-    }
-  );
+db.run(
+  "INSERT INTO events (title, start, end, description, color, user_id) VALUES (?, ?, ?, ?, ?, ?)",
+  [e.title, e.start, e.end, e.description, e.color, req.user.id],
+  function () {
+    res.json({ id: this.lastID });
+  }
+);
 });
 
 router.put('/:id', auth, (req, res) => {
   const e = req.body;
 
-  db.run(
-    "UPDATE events SET title=?, start=?, end=?, description=? WHERE id=? AND user_id=?",
-    [e.title, e.start, e.end, e.description, req.params.id, req.user.id],
-    function (err) {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: err.message });
-      }
-
-      res.json({ changes: this.changes });
-    }
-  );
+db.run(
+  "UPDATE events SET title=?, start=?, end=?, description=?, color=? WHERE id=? AND user_id=?",
+  [e.title, e.start, e.end, e.description, e.color, req.params.id, req.user.id],
+  function () {
+    res.json({ changes: this.changes });
+  }
+);
 });
 
 router.delete('/:id', auth, (req, res) => {
