@@ -13,6 +13,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final name = TextEditingController();
   final email = TextEditingController();
+  final oldPassword = TextEditingController();
+  final newPassword = TextEditingController();
 
   String? error;
 
@@ -42,6 +44,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Profile updated")));
+    }
+  }
+
+  void changePassword() async {
+    final success = await ApiService.changePassword(
+      oldPassword.text,
+      newPassword.text,
+    );
+
+    if (success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Password updated")));
     }
   }
 
@@ -103,6 +118,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ElevatedButton(onPressed: save, child: Text("Save")),
 
                   SizedBox(height: 30),
+
+                  Divider(),
+
+                  TextField(
+                    controller: oldPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: "Old Password"),
+                  ),
+                  TextField(
+                    controller: newPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: "New Password"),
+                  ),
+                  ElevatedButton(
+                    onPressed: changePassword,
+                    child: Text("Change Password"),
+                  ),
 
                   Divider(),
 

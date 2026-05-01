@@ -6,6 +6,8 @@ const db = require('../db');
 const router = express.Router();
 const SECRET = "supersecret";
 
+const auth = require('../middleware/authMiddleware');
+
 router.post('/register', async (req, res) => {
   const { email, password, name } = req.body;
 
@@ -36,6 +38,56 @@ router.post('/login', (req, res) => {
 
     res.json({ token });
   });
+});
+
+router.post('/forgot-password', async (req, res) => {
+  const { email, password } = req.body;
+
+  const hashed = await bcrypt.hash(password, 10);
+
+  db.run(
+    "UPDATE users SET password=? WHERE email=?",
+    [hashed, email],
+    function () {
+      if (this.changes > 0) {
+        res.json({ success: true });
+      } else {
+        res.json({ success: false });
+      }
+    }
+  );
+});
+
+router.post('/change-password', auth, (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  db.get(
+    "SELECT * FROM users WHERE id=?",
+    [req.user.id],
+    async (err, user) => {
+      if (!user) {
+        return res.json({ success: false });
+      }
+
+      // 🔥 сравниваем через bcrypt
+      const valid = await bcrypt.compare(oldPassword, user.password);
+
+      if (!valid) {
+        return res.json({ success: false });
+      }
+
+      // 🔥 хешируем новый пароль
+      const hashed = await bcrypt.hash(newPassword, 10);
+
+      db.run(
+        "UPDATE users SET password=? WHERE id=?",
+        [hashed, req.user.id],
+        function () {
+          res.json({ success: true });
+        }
+      );
+    }
+  );
 });
 
 module.exports = router;

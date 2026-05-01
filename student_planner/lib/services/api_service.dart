@@ -44,6 +44,45 @@ class ApiService {
     return res.statusCode == 200;
   }
 
+  static Future<bool> resetPassword(String email, String newPassword) async {
+    final res = await http.post(
+      Uri.parse("$baseUrl/auth/forgot-password"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email, "password": newPassword}),
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data["success"] == true;
+    }
+
+    return false;
+  }
+
+  static Future<bool> changePassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    final res = await http.post(
+      Uri.parse("$baseUrl/auth/change-password"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "oldPassword": oldPassword,
+        "newPassword": newPassword,
+      }),
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data["success"] == true;
+    }
+
+    return false;
+  }
+
   static Future<void> logout() async {
     token = null;
 

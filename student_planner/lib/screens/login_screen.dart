@@ -15,6 +15,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? error;
 
+  bool obscure = true;
+
   void login() async {
     if (email.text.isEmpty || password.text.isEmpty) {
       setState(() => error = "Fill all fields");
@@ -67,14 +69,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextField(
               controller: password,
-              obscureText: true,
+              obscureText: obscure,
               decoration: InputDecoration(
                 labelText: "Password",
+                suffixIcon: IconButton(
+                  icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      obscure = !obscure;
+                    });
+                  },
+                ),
                 border: OutlineInputBorder(),
               ),
             ),
 
             SizedBox(height: 20),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/forgot-password");
+                },
+                child: Text("Forgot Password?", style: TextStyle(fontSize: 13)),
+              ),
+            ),
 
             if (error != null)
               Text(error!, style: TextStyle(color: Colors.red)),

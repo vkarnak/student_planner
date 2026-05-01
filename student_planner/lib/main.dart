@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:student_planner/providers/event_provider.dart';
 import 'package:student_planner/screens/edit_task_screen.dart';
+import 'package:student_planner/screens/forgot_password_screen.dart';
 import 'package:student_planner/screens/schedule_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -64,6 +65,7 @@ class MyApp extends StatelessWidget {
 
             routes: {
               "/login": (_) => LoginScreen(),
+              "/forgot-password": (_) => ForgotPasswordScreen(),
               "/home": (_) => HomeScreen(),
               "/register": (_) => RegisterScreen(),
               "/add": (_) => AddTaskScreen(),
