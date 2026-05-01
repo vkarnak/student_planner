@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
+import '../services/api_service.dart'; // 🔥 добавь
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -30,7 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void save() async {
     final provider = Provider.of<ProfileProvider>(context, listen: false);
 
-    // 🔥 d. validate
     if (name.text.isEmpty || email.text.isEmpty) {
       setState(() => error = "Fill all fields");
       return;
@@ -42,6 +42,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Profile updated")));
+    }
+  }
+
+  // 🔥 LOGOUT
+  Future<void> logout() async {
+    final confirm = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Logout"),
+        content: Text("Are you sure you want to logout?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text("Logout"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ApiService.logout();
+
+      Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
     }
   }
 
@@ -74,6 +101,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(height: 20),
 
                   ElevatedButton(onPressed: save, child: Text("Save")),
+
+                  SizedBox(height: 30),
+
+                  Divider(),
+
+                  // 🔥 LOGOUT BUTTON
+                  ListTile(
+                    leading: Icon(Icons.logout, color: Colors.red),
+                    title: Text("Logout"),
+                    onTap: logout,
+                  ),
                 ],
               ),
             ),

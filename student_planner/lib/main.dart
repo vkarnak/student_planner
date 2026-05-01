@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
             home: auth.token == null ? LoginScreen() : HomeScreen(),
 
             routes: {
+              "/login": (_) => LoginScreen(),
               "/home": (_) => HomeScreen(),
               "/register": (_) => RegisterScreen(),
               "/add": (_) => AddTaskScreen(),

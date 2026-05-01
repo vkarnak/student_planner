@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class ApiService {
   static String get baseUrl {
     if (kIsWeb) {
@@ -40,6 +42,13 @@ class ApiService {
     );
 
     return res.statusCode == 200;
+  }
+
+  static Future<void> logout() async {
+    token = null;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
   }
 
   // 📋 TASKS
