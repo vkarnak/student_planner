@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:student_planner/providers/ai_provider.dart';
 import 'package:student_planner/providers/event_provider.dart';
 import 'package:student_planner/screens/edit_task_screen.dart';
 import 'package:student_planner/screens/forgot_password_screen.dart';
@@ -11,7 +12,6 @@ import 'providers/auth_provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/schedule_provider.dart';
 import 'providers/profile_provider.dart';
-import 'providers/suggestion_provider.dart'; // ✅ ДОБАВИЛИ
 
 // 🔔 Services
 import 'services/notification_service.dart';
@@ -25,7 +25,6 @@ import 'screens/add_event_screen.dart';
 import 'screens/edit_event_screen.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/profile_screen.dart';
-import 'screens/suggestion_screen.dart'; // ✅ ДОБАВИЛИ
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => ScheduleProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ChangeNotifierProvider(create: (_) => SuggestionProvider()),
+        ChangeNotifierProvider(create: (_) => AiProvider()),
       ],
 
       child: Consumer<AuthProvider>(
@@ -75,7 +74,6 @@ class MyApp extends StatelessWidget {
               "/schedule": (_) => ScheduleScreen(),
               "/calendar": (_) => CalendarScreen(),
               "/profile": (_) => ProfileScreen(),
-              "/suggestions": (_) => SuggestionScreen(),
             },
 
             supportedLocales: [Locale('ru', 'RU')],

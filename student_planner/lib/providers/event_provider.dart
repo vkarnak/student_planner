@@ -31,9 +31,15 @@ class EventProvider extends ChangeNotifier {
     return false;
   }
 
-  Future<void> updateEvent(Event event) async {
-    await EventService.updateEvent(event);
-    await loadEvents();
+  Future<bool> updateEvent(Event updated) async {
+    final success = await EventService.updateEvent(updated);
+
+    if (success) {
+      await loadEvents();
+      return true;
+    }
+
+    return false;
   }
 
   Future<void> deleteEvent(int id) async {

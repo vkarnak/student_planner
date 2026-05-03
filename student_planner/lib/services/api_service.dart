@@ -187,6 +187,15 @@ class ApiService {
     return [];
   }
 
+  static Future<List<dynamic>> getAiSuggestions() async {
+    final res = await http.get(
+      Uri.parse("$baseUrl/ai/schedule"),
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    return jsonDecode(res.body);
+  }
+
   // 🔥 UNIVERSAL GET
   static Future<List<dynamic>> get(String endpoint) async {
     final res = await http.get(
