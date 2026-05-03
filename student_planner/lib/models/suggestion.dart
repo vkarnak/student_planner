@@ -19,4 +19,6 @@ class Suggestion {
       end: DateTime.parse(json['end']),
     );
   }
+
+  get status => null;
 }

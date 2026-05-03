@@ -89,6 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final dayTasks = tasks.where((t) {
       if (t.deadline == null) return false;
+      if (t.status == "done") return false;
+
       final d = DateTime.parse(t.deadline!);
       return d.year == day.year && d.month == day.month && d.day == day.day;
     });
@@ -139,7 +141,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final ai = Provider.of<AiProvider>(context);
 
     final items = _selectedDay == null
-        ? [...taskProvider.tasks, ...eventProvider.events]
+        ? [
+            ...taskProvider.tasks.where((t) => t.status != "done"),
+            ...eventProvider.events,
+          ]
         : getItemsForDay(_selectedDay!);
 
     return Scaffold(
@@ -427,56 +432,75 @@ class _HomeScreenState extends State<HomeScreen> {
                   flex: 2,
                   child: Card(
                     margin: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: ai.suggestions.isEmpty
-                        ? Center(child: Text("💡 No suggestions"))
-                        : ListView.builder(
-                            itemCount: ai.suggestions.length,
-                            itemBuilder: (context, index) {
-                              final s = ai.suggestions[index];
+                    child: Builder(
+                      builder: (context) {
+                        final filtered = ai.suggestions.where((s) {
+                          final existsDone = taskProvider.tasks.any(
+                            (t) => t.title == s.title && t.status == "done",
+                          );
+                          return !existsDone;
+                        }).toList();
 
-                              return ListTile(
-                                leading: Icon(
-                                  Icons.lightbulb,
-                                  color: Colors.purple,
-                                ),
-                                title: Text(s.title),
-                                subtitle: Text(
-                                  "${formatDate(s.start)} ${formatTime(s.start)}",
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.add,
-                                        color: Colors.green,
-                                      ),
-                                      onPressed: () async {
-                                        await eventProvider.addEvent(
-                                          Event(
-                                            title: s.title,
-                                            start: s.start,
-                                            end: s.end,
-                                            color: "ai",
-                                          ),
-                                        );
-                                        ai.removeSuggestion(s);
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.close,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () {
-                                        ai.removeSuggestion(s);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                        if (filtered.isEmpty) {
+                          return Center(child: Text("💡 No suggestions"));
+                        }
+
+                        return ListView.builder(
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final s = filtered[index];
+
+                            return ListTile(
+                              leading: Icon(
+                                Icons.lightbulb,
+                                color: Colors.purple,
+                              ),
+                              title: Text(s.title),
+                              subtitle: Text(
+                                "${formatDate(s.start)} ${formatTime(s.start)}",
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.add, color: Colors.green),
+                                    onPressed: () async {
+                                      await eventProvider.addEvent(
+                                        Event(
+                                          title: s.title,
+                                          start: s.start,
+                                          end: s.end,
+                                          color: "ai",
+                                        ),
+                                      );
+                                      ai.removeSuggestion(s);
+                                    },
+                                  ),
+
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        "/edit_event",
+                                        arguments: s,
+                                      );
+                                    },
+                                  ),
+
+                                  IconButton(
+                                    icon: Icon(Icons.close, color: Colors.red),
+                                    onPressed: () {
+                                      ai.removeSuggestion(s);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
