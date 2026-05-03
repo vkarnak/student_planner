@@ -28,10 +28,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      Provider.of<TaskProvider>(context, listen: false).loadTasks();
-      Provider.of<EventProvider>(context, listen: false).loadEvents();
-      Provider.of<AiProvider>(context, listen: false).loadSuggestions();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final taskProvider = context.read<TaskProvider>();
+      final eventProvider = context.read<EventProvider>();
+      final aiProvider = context.read<AiProvider>();
+
+      await taskProvider.loadTasks();
+      await eventProvider.loadEvents();
+
+      aiProvider.bind(taskProvider, eventProvider);
     });
   }
 
@@ -148,7 +153,17 @@ class _HomeScreenState extends State<HomeScreen> {
         : getItemsForDay(_selectedDay!);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Dashboard")),
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () {
+              Navigator.pushNamed(context, "/profile");
+            },
+          ),
+        ],
+      ),
       body: Row(
         children: [
           // ================= LEFT =================
@@ -435,10 +450,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Builder(
                       builder: (context) {
                         final filtered = ai.suggestions.where((s) {
-                          final existsDone = taskProvider.tasks.any(
+                          final task = taskProvider.tasks.any(
                             (t) => t.title == s.title && t.status == "done",
                           );
-                          return !existsDone;
+                          return !task;
                         }).toList();
 
                         if (filtered.isEmpty) {
@@ -480,10 +495,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   IconButton(
                                     icon: Icon(Icons.edit),
                                     onPressed: () {
+                                      final event = Event(
+                                        title: s.title,
+                                        start: s.start,
+                                        end: s.end,
+                                        color: "ai",
+                                      );
+
                                       Navigator.pushNamed(
                                         context,
                                         "/edit_event",
-                                        arguments: s,
+                                        arguments: event,
                                       );
                                     },
                                   ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:student_planner/providers/ai_provider.dart';
+import 'package:student_planner/providers/event_provider.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 
