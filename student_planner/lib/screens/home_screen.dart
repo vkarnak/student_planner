@@ -181,12 +181,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: InkWell(
                       onTap: pickMonthYear,
-                      child: Text(
-                        "${monthName(_focusedDay.month)} ${_focusedDay.year}",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "${monthName(_focusedDay.month)} ${_focusedDay.year}",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Icon(Icons.arrow_drop_down),
+                        ],
                       ),
                     ),
                   ),
@@ -222,6 +228,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 },
                 eventLoader: getItemsForDay,
+
+                calendarBuilders: CalendarBuilders(
+                  markerBuilder: (context, day, items) {
+                    if (items.isEmpty) return null;
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: items.take(3).map((item) {
+                        Color color = item is Task
+                            ? getTaskColor(item)
+                            : getEventColor((item as Event).color);
+
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 1),
+                          width: 10,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
               ),
             ),
           ],
