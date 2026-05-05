@@ -10,7 +10,7 @@ class ApiService {
     if (kIsWeb) {
       return "https://student-planner-16vd.onrender.com"; // 🌐 Web
     } else if (Platform.isAndroid) {
-      return "http://10.0.2.2:3000"; // 🤖 Android emulator
+      return "https://student-planner-16vd.onrender.com"; // 🤖 Android emulator
     } else {
       return "https://student-planner-16vd.onrender.com"; // 💻 Windows / macOS
     }
