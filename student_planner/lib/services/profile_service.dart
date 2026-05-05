@@ -1,7 +1,6 @@
 import 'api_service.dart';
 
 class ProfileService {
-
   // 👤 GET PROFILE
   static Future<Map<String, dynamic>?> getProfile() async {
     return await ApiService.getProfile();

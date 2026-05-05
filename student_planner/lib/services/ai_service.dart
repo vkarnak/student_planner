@@ -1,7 +1,6 @@
 import 'api_service.dart';
 
 class AiService {
-
   static Future<List> optimize() async {
     return await ApiService.get("/optimize");
   }

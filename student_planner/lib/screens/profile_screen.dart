@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/profile_provider.dart';
-import '../services/api_service.dart'; // 🔥 добавь
+import '../providers/settings_provider.dart';
+import '../services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,16 +24,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    final profile = context.read<ProfileProvider>();
+    final settings = context.read<SettingsProvider>();
 
-    provider.loadProfile().then((_) {
-      name.text = provider.user?['name'] ?? "";
-      email.text = provider.user?['email'] ?? "";
+    profile.loadProfile().then((_) {
+      name.text = profile.user?['name'] ?? "";
+      email.text = profile.user?['email'] ?? "";
     });
+
+    settings.load();
   }
 
+  // ================= SAVE =================
   void save() async {
-    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    final provider = context.read<ProfileProvider>();
 
     if (name.text.isEmpty || email.text.isEmpty) {
       setState(() => error = "Fill all fields");
@@ -47,26 +53,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // ================= PASSWORD =================
   void changePassword() async {
     final success = await ApiService.changePassword(
       oldPassword.text,
       newPassword.text,
     );
 
-    if (success) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Password updated")));
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(success ? "Password updated" : "Error")),
+    );
   }
 
-  // 🔥 LOGOUT
+  // ================= LOGOUT =================
   Future<void> logout() async {
     final confirm = await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Logout"),
-        content: Text("Are you sure you want to logout?"),
+        content: Text("Are you sure?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -82,67 +87,149 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (confirm == true) {
       await ApiService.logout();
-
-      Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/login", (_) => false);
     }
   }
 
+  // ================= UI =================
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ProfileProvider>(context);
+    final profile = context.watch<ProfileProvider>();
+    final settings = context.watch<SettingsProvider>();
 
     return Scaffold(
       appBar: AppBar(title: Text("Profile")),
 
-      body: provider.isLoading
+      body: profile.isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
+          : SingleChildScrollView(
               padding: EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(
-                    controller: name,
-                    decoration: InputDecoration(labelText: "Name"),
-                  ),
+                  // ================= PROFILE =================
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: name,
+                            decoration: InputDecoration(labelText: "Name"),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            controller: email,
+                            decoration: InputDecoration(labelText: "Email"),
+                          ),
 
-                  TextField(
-                    controller: email,
-                    decoration: InputDecoration(labelText: "Email"),
-                  ),
+                          if (error != null)
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: Text(
+                                error!,
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
 
-                  if (error != null)
-                    Text(error!, style: TextStyle(color: Colors.red)),
+                          SizedBox(height: 15),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: save,
+                              child: Text("Save"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
                   SizedBox(height: 20),
 
-                  ElevatedButton(onPressed: save, child: Text("Save")),
+                  // ================= 🔔 NOTIFICATIONS =================
+                  Card(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(
+                            "Notifications",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
 
-                  SizedBox(height: 30),
+                        SwitchListTile(
+                          title: Text("Daily plan"),
+                          subtitle: Text("Morning schedule"),
+                          value: settings.settings.dailyPlan,
+                          onChanged: settings.toggleDailyPlan,
+                        ),
 
-                  Divider(),
+                        SwitchListTile(
+                          title: Text("Deadlines"),
+                          subtitle: Text("Remind before deadline"),
+                          value: settings.settings.deadlines,
+                          onChanged: settings.toggleDeadlines,
+                        ),
 
-                  TextField(
-                    controller: oldPassword,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: "Old Password"),
+                        SwitchListTile(
+                          title: Text("AI suggestions"),
+                          subtitle: Text("Smart time suggestions"),
+                          value: settings.settings.aiSuggestions,
+                          onChanged: settings.toggleAi,
+                        ),
+                      ],
+                    ),
                   ),
-                  TextField(
-                    controller: newPassword,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: "New Password"),
-                  ),
-                  ElevatedButton(
-                    onPressed: changePassword,
-                    child: Text("Change Password"),
+
+                  SizedBox(height: 20),
+
+                  // ================= PASSWORD =================
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: oldPassword,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: "Old password",
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            controller: newPassword,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: "New password",
+                            ),
+                          ),
+
+                          SizedBox(height: 15),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: changePassword,
+                              child: Text("Change password"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
-                  Divider(),
+                  SizedBox(height: 20),
 
-                  // 🔥 LOGOUT BUTTON
-                  ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
-                    title: Text("Logout"),
-                    onTap: logout,
+                  // ================= LOGOUT =================
+                  Card(
+                    child: ListTile(
+                      leading: Icon(Icons.logout, color: Colors.red),
+                      title: Text("Logout"),
+                      onTap: logout,
+                    ),
                   ),
                 ],
               ),

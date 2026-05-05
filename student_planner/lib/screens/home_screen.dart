@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:student_planner/providers/settings_provider.dart';
 import 'package:student_planner/screens/add_event_screen.dart';
 import 'package:student_planner/screens/add_task_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
       await taskProvider.loadTasks();
       await eventProvider.loadEvents();
 
-      aiProvider.bind(taskProvider, eventProvider);
+      final settingsProvider = context.read<SettingsProvider>();
+      aiProvider.bind(taskProvider, eventProvider, settingsProvider);
     });
   }
 

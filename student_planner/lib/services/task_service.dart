@@ -2,7 +2,6 @@ import 'api_service.dart';
 import '../models/task.dart';
 
 class TaskService {
-
   // 📋 GET TASKS
   static Future<List<Task>> getTasks() async {
     final data = await ApiService.getTasks();

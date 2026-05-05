@@ -5,24 +5,27 @@ const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/', auth, (req, res) => {
+  const now = new Date().toISOString();
+  const tomorrow = new Date(
+    Date.now() + 24 * 60 * 60 * 1000
+  ).toISOString();
 
   db.all(
-    "SELECT * FROM tasks WHERE user_id=?",
-    [req.user.id],
+    `
+    SELECT * FROM tasks
+    WHERE user_id = ?
+    AND deadline IS NOT NULL
+    AND deadline BETWEEN ? AND ?
+    `,
+    [req.user.id, now, tomorrow],
     (err, tasks) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Database error",
+        });
+      }
 
-      const now = new Date();
-
-      const upcoming = tasks.filter(t => {
-        const deadline = new Date(t.deadline);
-
-        const diff =
-          (deadline - now) / (1000 * 60 * 60 * 24);
-
-        return diff >= 0 && diff <= 1;
-      });
-
-      res.json(upcoming);
+      res.json(tasks);
     }
   );
 });
