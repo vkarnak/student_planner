@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -16,6 +17,14 @@ app.use('/deadlines', require('./routes/deadlines'));
 app.use('/reminders', require('./routes/reminders'));
 app.use('/ai', require('./routes/ai'));
 
+// 🔥 Flutter Web (ОЧЕНЬ ВАЖНО — ДО listen)
+app.use(express.static(path.join(__dirname, 'web')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'web', 'index.html'));
+});
+
+// 🔥 запуск сервера (ВСЕГДА В КОНЦЕ)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
