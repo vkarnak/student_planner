@@ -141,11 +141,267 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _buildCalendar() {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.chevron_left),
+                  onPressed: () {
+                    setState(() {
+                      _focusedDay = DateTime(
+                        _focusedDay.year,
+                        _focusedDay.month - 1,
+                      );
+                    });
+                  },
+                ),
+
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _focusedDay = DateTime.now();
+                      _selectedDay = DateTime.now();
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text("Today", style: TextStyle(color: Colors.blue)),
+                  ),
+                ),
+
+                Expanded(
+                  child: Center(
+                    child: InkWell(
+                      onTap: pickMonthYear,
+                      child: Text(
+                        "${monthName(_focusedDay.month)} ${_focusedDay.year}",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.chevron_right),
+                  onPressed: () {
+                    setState(() {
+                      _focusedDay = DateTime(
+                        _focusedDay.year,
+                        _focusedDay.month + 1,
+                      );
+                    });
+                  },
+                ),
+              ],
+            ),
+
+            Expanded(
+              child: TableCalendar(
+                firstDay: DateTime.utc(1900),
+                lastDay: DateTime.utc(2500),
+                focusedDay: _focusedDay,
+                headerVisible: false,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onDaySelected: (selected, focused) {
+                  setState(() {
+                    _selectedDay = isSameDay(_selectedDay, selected)
+                        ? null
+                        : selected;
+                    _focusedDay = focused;
+                  });
+                },
+                eventLoader: getItemsForDay,
+              ),
+            ),
+          ],
+        ),
+
+        // ✅ ВОТ ОН — ВНУТРИ Stack
+        Positioned(
+          bottom: 12,
+          right: 12,
+          child: FloatingActionButton(
+            mini: true,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AddEventScreen()),
+              );
+            },
+            child: Icon(Icons.add),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItemsList(List items, EventProvider eventProvider) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+
+        if (item is Task) {
+          final overdue = isOverdue(item);
+
+          return ListTile(
+            leading: Icon(
+              Icons.circle,
+              size: 10,
+              color: overdue ? Colors.red : getTaskColor(item),
+            ),
+            title: Text(
+              item.title,
+              style: TextStyle(
+                color: overdue ? Colors.red : null,
+                fontWeight: overdue ? FontWeight.bold : null,
+              ),
+            ),
+            subtitle: item.deadline != null
+                ? Text(formatDate(DateTime.parse(item.deadline!)))
+                : null,
+          );
+        }
+
+        final e = item as Event;
+
+        return ListTile(
+          leading: Icon(Icons.calendar_today, color: getEventColor(e.color)),
+          title: Text(e.title),
+          subtitle: Text("${formatDate(e.start)} ${formatTime(e.start)}"),
+          onTap: () {
+            Navigator.pushNamed(context, "/edit_event", arguments: e);
+          },
+          trailing: IconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              eventProvider.deleteEvent(e.id!);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTasks(TaskProvider taskProvider) {
+    return Stack(
+      children: [
+        Card(
+          margin: EdgeInsets.all(16),
+          child: ListView.builder(
+            itemCount: taskProvider.tasks.length,
+            itemBuilder: (context, index) {
+              return TaskTile(taskProvider.tasks[index]);
+            },
+          ),
+        ),
+
+        Positioned(
+          bottom: 24,
+          right: 24,
+          child: FloatingActionButton(
+            mini: true,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AddTaskScreen()),
+              );
+            },
+            child: Icon(Icons.add),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAI(
+    AiProvider ai,
+    TaskProvider taskProvider,
+    EventProvider eventProvider,
+  ) {
+    final filtered = ai.suggestions.where((s) {
+      final task = taskProvider.tasks.any(
+        (t) => t.title == s.title && t.status == "done",
+      );
+      return !task;
+    }).toList();
+
+    if (filtered.isEmpty) {
+      return Center(child: Text("💡 No suggestions"));
+    }
+
+    return ListView.builder(
+      itemCount: filtered.length,
+      itemBuilder: (context, index) {
+        final s = filtered[index];
+
+        return ListTile(
+          leading: Icon(Icons.lightbulb, color: Colors.purple),
+          title: Text(s.title),
+          subtitle: Text("${formatDate(s.start)} ${formatTime(s.start)}"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.add, color: Colors.green),
+                onPressed: () async {
+                  await eventProvider.addEvent(
+                    Event(
+                      title: s.title,
+                      start: s.start,
+                      end: s.end,
+                      color: "ai",
+                    ),
+                  );
+                  ai.removeSuggestion(s);
+                },
+              ),
+
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  final event = Event(
+                    title: s.title,
+                    start: s.start,
+                    end: s.end,
+                    color: "ai",
+                  );
+
+                  Navigator.pushNamed(context, "/edit_event", arguments: event);
+                },
+              ),
+
+              IconButton(
+                icon: Icon(Icons.close, color: Colors.red),
+                onPressed: () {
+                  ai.removeSuggestion(s);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
     final eventProvider = Provider.of<EventProvider>(context);
     final ai = Provider.of<AiProvider>(context);
+
+    final isMobile = MediaQuery.of(context).size.width < 700;
 
     final items = _selectedDay == null
         ? [
@@ -166,372 +422,104 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Row(
-        children: [
-          // ================= LEFT =================
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.all(16),
+
+      body: isMobile
+          ? SingleChildScrollView(
               child: Column(
                 children: [
-                  // ================= CALENDAR =================
-                  Expanded(
-                    flex: 3,
-                    child: Card(
-                      child: Stack(
-                        children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.chevron_left),
-                                    onPressed: () {
-                                      setState(() {
-                                        _focusedDay = DateTime(
-                                          _focusedDay.year,
-                                          _focusedDay.month - 1,
-                                        );
-                                      });
-                                    },
-                                  ),
-
-                                  // TODAY
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _focusedDay = DateTime.now();
-                                        _selectedDay = DateTime.now();
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade50,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        "Today",
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                    ),
-                                  ),
-
-                                  Expanded(
-                                    child: Center(
-                                      child: InkWell(
-                                        onTap: pickMonthYear,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              "${monthName(_focusedDay.month)} ${_focusedDay.year}",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Icon(Icons.arrow_drop_down),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  IconButton(
-                                    icon: Icon(Icons.chevron_right),
-                                    onPressed: () {
-                                      setState(() {
-                                        _focusedDay = DateTime(
-                                          _focusedDay.year,
-                                          _focusedDay.month + 1,
-                                        );
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-
-                              Expanded(
-                                child: TableCalendar(
-                                  firstDay: DateTime.utc(1900, 1, 1),
-                                  lastDay: DateTime.utc(2500, 12, 31),
-                                  focusedDay: _focusedDay,
-                                  headerVisible: false,
-                                  startingDayOfWeek: StartingDayOfWeek.monday,
-                                  selectedDayPredicate: (day) =>
-                                      isSameDay(_selectedDay, day),
-                                  onDaySelected: (selected, focused) {
-                                    setState(() {
-                                      _selectedDay =
-                                          isSameDay(_selectedDay, selected)
-                                          ? null
-                                          : selected;
-                                      _focusedDay = focused;
-                                    });
-                                  },
-                                  eventLoader: getItemsForDay,
-                                  calendarBuilders: CalendarBuilders(
-                                    markerBuilder: (context, day, items) {
-                                      if (items.isEmpty) return null;
-
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: items.take(3).map((item) {
-                                          Color color = item is Task
-                                              ? getTaskColor(item)
-                                              : getEventColor(
-                                                  (item as Event).color,
-                                                );
-
-                                          return Container(
-                                            margin: EdgeInsets.symmetric(
-                                              horizontal: 1,
-                                            ),
-                                            width: 10,
-                                            height: 3,
-                                            decoration: BoxDecoration(
-                                              color: color,
-                                              borderRadius:
-                                                  BorderRadius.circular(2),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Positioned(
-                            bottom: 12,
-                            right: 12,
-                            child: FloatingActionButton(
-                              mini: true,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => AddEventScreen(),
-                                  ),
-                                );
-                              },
-                              child: Icon(Icons.add),
-                            ),
-                          ),
-                        ],
-                      ),
+                  // 📅 CALENDAR
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      height: 420,
+                      child: Card(child: _buildCalendar()),
                     ),
                   ),
 
-                  SizedBox(height: 10),
+                  // 📊 ITEMS (день / все)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: SizedBox(
+                      height: 260,
+                      child: Card(child: _buildItemsList(items, eventProvider)),
+                    ),
+                  ),
 
-                  // ================= LIST =================
-                  Expanded(
-                    flex: 2,
-                    child: Card(
-                      child: ListView.builder(
-                        itemCount: items.length,
-                        itemBuilder: (context, index) {
-                          final item = items[index];
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      height: 300,
+                      child: _buildTasks(taskProvider),
+                    ),
+                  ),
 
-                          if (item is Task) {
-                            final overdue = isOverdue(item);
-
-                            return ListTile(
-                              leading: Icon(
-                                Icons.circle,
-                                size: 10,
-                                color: overdue
-                                    ? Colors.red
-                                    : getTaskColor(item),
-                              ),
-                              title: Text(
-                                item.title,
-                                style: TextStyle(
-                                  color: overdue ? Colors.red : null,
-                                  fontWeight: overdue ? FontWeight.bold : null,
-                                ),
-                              ),
-                              subtitle: item.deadline != null
-                                  ? Text(
-                                      formatDate(
-                                        DateTime.parse(item.deadline!),
-                                      ),
-                                    )
-                                  : null,
-                            );
-                          }
-
-                          final e = item as Event;
-
-                          return ListTile(
-                            leading: Icon(
-                              Icons.calendar_today,
-                              color: getEventColor(e.color),
-                            ),
-                            title: Text(e.title),
-                            subtitle: Text(
-                              "${formatDate(e.start)} ${formatTime(e.start)}",
-                            ),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                "/edit_event",
-                                arguments: e,
-                              );
-                            },
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                eventProvider.deleteEvent(e.id!);
-                              },
-                            ),
-                          );
-                        },
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      height: 260,
+                      child: Card(
+                        child: _buildAI(ai, taskProvider, eventProvider),
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // ================= RIGHT =================
-          Expanded(
-            flex: 1,
-            child: Column(
+            )
+          : Row(
               children: [
-                // TASKS
+                // ================= LEFT =================
                 Expanded(
-                  flex: 3,
-                  child: Stack(
+                  flex: 2,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // ================= CALENDAR =================
+                        Expanded(flex: 3, child: Card(child: _buildCalendar())),
+                        SizedBox(height: 10),
+                        Expanded(
+                          flex: 2,
+                          child: Card(
+                            child: _buildItemsList(items, eventProvider),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  flex: 1,
+                  child: Column(
                     children: [
-                      Card(
-                        margin: EdgeInsets.all(16),
-                        child: ListView.builder(
-                          itemCount: taskProvider.tasks.length,
-                          itemBuilder: (context, index) {
-                            return TaskTile(taskProvider.tasks[index]);
-                          },
+                      Expanded(
+                        flex: 3,
+                        child: Stack(
+                          children: [
+                            Card(
+                              margin: EdgeInsets.all(16),
+                              child: _buildTasks(taskProvider),
+                            ),
+                          ],
                         ),
                       ),
 
-                      Positioned(
-                        bottom: 24,
-                        right: 24,
-                        child: FloatingActionButton(
-                          mini: true,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AddTaskScreen(),
-                              ),
-                            );
-                          },
-                          child: Icon(Icons.add),
+                      Expanded(
+                        flex: 2,
+                        child: Card(
+                          margin: EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                          child: _buildAI(ai, taskProvider, eventProvider),
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // AI
-                Expanded(
-                  flex: 2,
-                  child: Card(
-                    margin: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: Builder(
-                      builder: (context) {
-                        final filtered = ai.suggestions.where((s) {
-                          final task = taskProvider.tasks.any(
-                            (t) => t.title == s.title && t.status == "done",
-                          );
-                          return !task;
-                        }).toList();
-
-                        if (filtered.isEmpty) {
-                          return Center(child: Text("💡 No suggestions"));
-                        }
-
-                        return ListView.builder(
-                          itemCount: filtered.length,
-                          itemBuilder: (context, index) {
-                            final s = filtered[index];
-
-                            return ListTile(
-                              leading: Icon(
-                                Icons.lightbulb,
-                                color: Colors.purple,
-                              ),
-                              title: Text(s.title),
-                              subtitle: Text(
-                                "${formatDate(s.start)} ${formatTime(s.start)}",
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.add, color: Colors.green),
-                                    onPressed: () async {
-                                      await eventProvider.addEvent(
-                                        Event(
-                                          title: s.title,
-                                          start: s.start,
-                                          end: s.end,
-                                          color: "ai",
-                                        ),
-                                      );
-                                      ai.removeSuggestion(s);
-                                    },
-                                  ),
-
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      final event = Event(
-                                        title: s.title,
-                                        start: s.start,
-                                        end: s.end,
-                                        color: "ai",
-                                      );
-
-                                      Navigator.pushNamed(
-                                        context,
-                                        "/edit_event",
-                                        arguments: event,
-                                      );
-                                    },
-                                  ),
-
-                                  IconButton(
-                                    icon: Icon(Icons.close, color: Colors.red),
-                                    onPressed: () {
-                                      ai.removeSuggestion(s);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
