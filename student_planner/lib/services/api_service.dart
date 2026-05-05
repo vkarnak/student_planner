@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiService {
   static String get baseUrl {
     if (kIsWeb) {
-      return "http://127.0.0.1:3000"; // 🌐 Web
+      return "https://student-planner-16vd.onrender.com"; // 🌐 Web
     } else if (Platform.isAndroid) {
       return "http://10.0.2.2:3000"; // 🤖 Android emulator
     } else {
