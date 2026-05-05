@@ -42,9 +42,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // 🔐 Авторизация
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider()..tryAutoLogin(),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthProvider()..tryAutoLogin()),
 
         // 📊 Данные
         ChangeNotifierProvider(create: (_) => TaskProvider()),
@@ -52,9 +50,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
 
         // ⚙️ Настройки (с загрузкой)
-        ChangeNotifierProvider(
-          create: (_) => SettingsProvider()..load(),
-        ),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()..load()),
 
         // 🧠 AI
         ChangeNotifierProvider(create: (_) => AiProvider()),
@@ -72,9 +68,7 @@ class MyApp extends StatelessWidget {
             ),
 
             // 🔑 Главный экран
-            home: auth.token == null
-                ? const LoginScreen()
-                : const HomeScreen(),
+            home: auth.token == null ? const LoginScreen() : const HomeScreen(),
 
             // 📍 Роуты
             routes: {
@@ -90,11 +84,8 @@ class MyApp extends StatelessWidget {
             },
 
             // 🌍 Локализация
-            supportedLocales: const [
-              Locale('ru', 'RU'),
-            ],
-            localizationsDelegates:
-                GlobalMaterialLocalizations.delegates,
+            supportedLocales: const [Locale('ru', 'RU')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
           );
         },
       ),

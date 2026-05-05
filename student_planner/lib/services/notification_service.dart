@@ -27,11 +27,16 @@ class NotificationService {
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const settings = InitializationSettings(android: android);
+    const windows = WindowsInitializationSettings(
+      appName: 'Student Planner',
+      appUserModelId: 'student_planner_app',
+      guid: '12345678-1234-1234-1234-123456789012',
+    );
+
+    const settings = InitializationSettings(android: android, windows: windows);
 
     await _notifications.initialize(settings: settings);
   }
-
   // =============================
   // CANCEL
   // =============================
