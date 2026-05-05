@@ -15,8 +15,9 @@ app.use('/schedule', require('./routes/schedule'));
 app.use('/deadlines', require('./routes/deadlines'));
 app.use('/reminders', require('./routes/reminders'));
 app.use('/ai', require('./routes/ai'));
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });
