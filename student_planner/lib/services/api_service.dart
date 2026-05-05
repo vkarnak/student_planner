@@ -12,7 +12,7 @@ class ApiService {
     } else if (Platform.isAndroid) {
       return "http://10.0.2.2:3000"; // 🤖 Android emulator
     } else {
-      return "http://127.0.0.1:3000"; // 💻 Windows / macOS
+      return "https://student-planner-16vd.onrender.com"; // 💻 Windows / macOS
     }
   }
 
