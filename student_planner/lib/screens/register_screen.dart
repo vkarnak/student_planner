@@ -18,7 +18,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? error;
 
   void register() async {
-    // 🔥 c. validate input
     if (name.text.isEmpty || email.text.isEmpty || password.text.isEmpty) {
       setState(() => error = "All fields are required");
       return;
@@ -41,18 +40,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
 
-    // 🔥 d. send request
     bool success = await auth.register(email.text, password.text, name.text);
 
     setState(() => isLoading = false);
 
     if (success) {
-      // 🔥 h. notify UI
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Account created successfully")));
 
-      // 🔥 i. navigate
       Navigator.pop(context);
     } else {
       setState(() => error = "User already exists");

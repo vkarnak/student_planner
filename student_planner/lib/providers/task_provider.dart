@@ -9,7 +9,6 @@ class TaskProvider extends ChangeNotifier {
 
   Object? get upcoming => null;
 
-  // 🔥 загрузка задач
   Future<void> loadTasks() async {
     isLoading = true;
     notifyListeners();
@@ -20,19 +19,16 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ➕ добавить
   Future<void> addTask(Task task) async {
     await TaskService.addTask(task);
-    await loadTasks(); // 🔥 refresh
+    await loadTasks();
   }
 
-  // ✏️ обновить
   Future<void> updateTask(Task task) async {
     await TaskService.updateTask(task);
     await loadTasks();
   }
 
-  // ❌ удалить
   Future<void> deleteTask(int id) async {
     await TaskService.deleteTask(id);
     await loadTasks();

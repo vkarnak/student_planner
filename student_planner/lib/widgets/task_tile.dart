@@ -10,7 +10,6 @@ class TaskTile extends StatelessWidget {
 
   const TaskTile(this.task, {super.key});
 
-  // 🎨 цвет по приоритету
   Color getColor() {
     switch (task.priority) {
       case 4:
@@ -24,7 +23,6 @@ class TaskTile extends StatelessWidget {
     }
   }
 
-  // 📅 формат даты
   String formatDate(String? isoDate) {
     if (isoDate == null || isoDate.isEmpty) return "-";
     final date = DateTime.parse(isoDate);
@@ -38,7 +36,6 @@ class TaskTile extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(radius: 6, backgroundColor: getColor()),
 
-        // 📌 TITLE
         title: Text(
           task.title,
           style: TextStyle(
@@ -49,17 +46,14 @@ class TaskTile extends StatelessWidget {
           ),
         ),
 
-        // 📅 DEADLINE
         subtitle: Text(
           "Due: ${formatDate(task.deadline)}",
           style: TextStyle(color: Colors.grey[600]),
         ),
 
-        // 🔧 ACTIONS
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ✏️ EDIT
             IconButton(
               icon: Icon(Icons.edit),
               onPressed: () {
@@ -67,7 +61,6 @@ class TaskTile extends StatelessWidget {
               },
             ),
 
-            // ❌ DELETE
             IconButton(
               icon: Icon(Icons.delete, color: Colors.red),
               onPressed: () async {
@@ -98,7 +91,6 @@ class TaskTile extends StatelessWidget {
               },
             ),
 
-            // ✅ DONE / UNDONE
             IconButton(
               icon: Icon(
                 task.status == "done"

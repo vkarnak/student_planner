@@ -9,7 +9,6 @@ class UserSettings {
     this.aiSuggestions = true,
   });
 
-  // ================= FROM JSON =================
   factory UserSettings.fromJson(Map<String, dynamic>? json) {
     if (json == null) return const UserSettings();
 
@@ -20,7 +19,6 @@ class UserSettings {
     );
   }
 
-  // ================= TO JSON =================
   Map<String, dynamic> toJson() {
     return {
       'dailyPlan': dailyPlan,
@@ -29,7 +27,6 @@ class UserSettings {
     };
   }
 
-  // ================= COPY =================
   UserSettings copyWith({
     bool? dailyPlan,
     bool? deadlines,
@@ -42,10 +39,8 @@ class UserSettings {
     );
   }
 
-  // ================= DEFAULT =================
   static const defaults = UserSettings();
 
-  // ================= EQUALITY =================
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||

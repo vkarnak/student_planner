@@ -16,14 +16,12 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<bool> updateProfile(String name, String email) async {
-    // 🔥 d. validate input
     if (name.isEmpty || email.isEmpty) {
       return false;
     }
 
     await ApiService.updateProfile(name, email);
 
-    // 🔥 i. refresh UI
     await loadProfile();
 
     return true;

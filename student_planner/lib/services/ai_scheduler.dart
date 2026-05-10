@@ -10,7 +10,6 @@ class AiScheduler {
         .where((t) => t.status != "done" && t.deadline != null)
         .toList();
 
-    /// === СОРТИРОВКА ===
     activeTasks.sort((a, b) {
       final da = DateTime.parse(a.deadline!);
       final db = DateTime.parse(b.deadline!);
@@ -27,7 +26,6 @@ class AiScheduler {
     final List<Suggestion> result = [];
     final Map<DateTime, int> dayLoad = {};
 
-    /// === ПРОВЕРКА СВОБОДЫ ===
     bool isFree(DateTime start, DateTime end) {
       final busyEvents = events.any(
         (e) => start.isBefore(e.end) && end.isAfter(e.start),
@@ -40,7 +38,6 @@ class AiScheduler {
       return !busyEvents && !busyTasks;
     }
 
-    /// === СКОРИНГ ===
     int scoreSlot({
       required DateTime start,
       required DateTime deadline,
@@ -68,7 +65,6 @@ class AiScheduler {
       return score;
     }
 
-    /// === ПОИСК СЛОТА ===
     DateTime? tryPlace({
       required Duration duration,
       required DateTime deadline,
@@ -112,7 +108,6 @@ class AiScheduler {
       return bestSlot;
     }
 
-    /// === ОСНОВНОЙ АЛГОРИТМ ===
     for (var task in activeTasks) {
       final deadline = DateTime.parse(task.deadline!);
       final totalMinutes = task.duration ?? 60;
@@ -128,16 +123,13 @@ class AiScheduler {
       final isOverdue = deadline.isBefore(now);
 
       if (singleSlot != null || totalMinutes <= 3 || isOverdue) {
-        /// ✅ НЕ ДЕЛИМ ВООБЩЕ
         chunks = [fullDuration];
       } else {
-        /// ✅ ДЕЛИМ ТОЛЬКО ДЛИННЫЕ ЗАДАЧИ
         int remaining = totalMinutes ~/ 60;
 
         while (remaining > 0) {
           int block = remaining >= 3 ? 2 : remaining;
 
-          // защита от дебилизма (никогда не больше остатка)
           if (block > remaining) block = remaining;
 
           chunks.add(Duration(hours: block));
@@ -146,7 +138,6 @@ class AiScheduler {
       }
       DateTime? previousEnd;
 
-      /// 2. РАЗМЕЩАЕМ ЧАСТИ
       for (int i = 0; i < chunks.length; i++) {
         final partDuration = chunks[i];
 
@@ -171,7 +162,6 @@ class AiScheduler {
             if (end.isAfter(deadline)) continue;
             if (!isFree(start, end)) continue;
 
-            /// части идут по порядку
             if (previousEnd != null && start.isBefore(previousEnd)) {
               continue;
             }

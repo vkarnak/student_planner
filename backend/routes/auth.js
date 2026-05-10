@@ -69,14 +69,12 @@ router.post('/change-password', auth, (req, res) => {
         return res.json({ success: false });
       }
 
-      // 🔥 сравниваем через bcrypt
       const valid = await bcrypt.compare(oldPassword, user.password);
 
       if (!valid) {
         return res.json({ success: false });
       }
 
-      // 🔥 хешируем новый пароль
       const hashed = await bcrypt.hash(newPassword, 10);
 
       db.run(

@@ -21,7 +21,6 @@ class Task {
     this.createdAt,
   });
 
-  // 📥 FROM JSON
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: json['id'],
@@ -38,7 +37,6 @@ class Task {
     );
   }
 
-  // 📤 TO JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -53,7 +51,6 @@ class Task {
     };
   }
 
-  // 🔁 COPY
   Task copyWith({
     int? id,
     String? title,
@@ -78,17 +75,11 @@ class Task {
     );
   }
 
-  // =========================
-  // 💡 УДОБНЫЕ ГЕТТЕРЫ
-  // =========================
-
-  /// 📅 Преобразует строку в DateTime
   DateTime? get deadlineDate {
     if (deadline == null) return null;
     return DateTime.tryParse(deadline!);
   }
 
-  /// 📅 Формат dd.MM.yyyy
   String get formattedDeadline {
     if (deadlineDate == null) return "No deadline";
 
@@ -98,7 +89,6 @@ class Task {
         "${d.year}";
   }
 
-  /// ⏱ Часы и минуты
   String get formattedDuration {
     if (duration == null) return "-";
 
@@ -113,6 +103,5 @@ class Task {
     return deadlineDate!.difference(DateTime.now()).inDays;
   }
 
-  /// ✅ Проверка статуса
   bool get isDone => status == "done";
 }

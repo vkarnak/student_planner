@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'api_service.dart';
 
 class AuthService {
-  // 🔐 LOGIN
   static Future<String?> login(String email, String password) async {
     final res = await http.post(
       Uri.parse("${ApiService.baseUrl}/auth/login"),
@@ -19,7 +18,6 @@ class AuthService {
     return null;
   }
 
-  // 📝 REGISTER
   static Future<bool> register(
     String email,
     String password,

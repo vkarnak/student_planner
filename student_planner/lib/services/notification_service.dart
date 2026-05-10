@@ -18,10 +18,6 @@ class NotificationService {
     await android?.requestNotificationsPermission();
   }
 
-  // =============================
-  // INIT
-  // =============================
-
   static Future<void> init() async {
     tz.initializeTimeZones();
 
@@ -37,17 +33,10 @@ class NotificationService {
 
     await _notifications.initialize(settings: settings);
   }
-  // =============================
-  // CANCEL
-  // =============================
 
   static Future<void> cancelAll() async {
     await _notifications.cancelAll();
   }
-
-  // =============================
-  // BASE SCHEDULER
-  // =============================
 
   static Future<void> _schedule({
     required int id,
@@ -73,9 +62,6 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
-  // =============================
-  // 🌅 DAILY PLAN
-  // =============================
 
   static Future<void> scheduleDailyPlan(
     List<Event> events,
@@ -96,7 +82,7 @@ class NotificationService {
       return aTime.compareTo(bTime);
     });
 
-    String body = "Сегодня:\n";
+    String body = "Today:\n";
 
     for (var item in todayItems.take(3)) {
       final start = item is Event ? item.start : (item as Suggestion).start;
@@ -109,20 +95,11 @@ class NotificationService {
     final baseTime = DateTime(now.year, now.month, now.day, 8, 0);
 
     final notifyTime = baseTime.isBefore(now)
-        ? now.add(const Duration(seconds: 5)) // отправить сразу
+        ? now.add(const Duration(seconds: 5))
         : baseTime;
 
-    await _schedule(
-      id: 1,
-      title: "📅 План на день",
-      body: body,
-      date: notifyTime,
-    );
+    await _schedule(id: 1, title: "Daily Plan", body: body, date: notifyTime);
   }
-
-  // =============================
-  // ⏰ DEADLINES
-  // =============================
 
   static Future<void> scheduleDeadlines(List<Task> tasks) async {
     int id = 100;
@@ -138,16 +115,12 @@ class NotificationService {
 
       await _schedule(
         id: id++,
-        title: "⚠️ Дедлайн завтра",
+        title: "Deadline tomorrow",
         body: t.title,
         date: notifyTime,
       );
     }
   }
-
-  // =============================
-  // 💡 AI SUGGESTIONS
-  // =============================
 
   static Future<void> scheduleAISuggestions(
     List<Suggestion> suggestions,
@@ -163,22 +136,17 @@ class NotificationService {
 
     final notifyTime = s.start.subtract(const Duration(minutes: 10));
 
-    // ❌ не ночью
     if (notifyTime.hour < 8 || notifyTime.hour > 22) return;
 
     if (notifyTime.isBefore(now)) return;
 
     await _schedule(
       id: 200,
-      title: "💡 Есть окно",
-      body: "В ${_time(s.start)} можно заняться:\n${s.title}",
+      title: "AI Suggestion",
+      body: "At ${_time(s.start)} you can work on:\n${s.title}",
       date: notifyTime,
     );
   }
-
-  // =============================
-  // HELPERS
-  // =============================
 
   static bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;

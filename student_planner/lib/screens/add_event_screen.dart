@@ -23,7 +23,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
   String? error;
   bool isLoading = false;
 
-  // 🎨 EVENT COLOR
   Color getEventColor(String color) {
     switch (color) {
       case "red":
@@ -37,7 +36,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  // 📅 DATE
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -51,7 +49,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  // ⏰ START
   Future<void> pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -63,7 +60,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  // ⏰ END
   Future<void> pickEndTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -75,7 +71,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  // 🎨 COLOR PICKER
   Widget _colorDot(String color) {
     return GestureDetector(
       onTap: () {
@@ -96,7 +91,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     );
   }
 
-  // 💾 CREATE EVENT
   void createEvent() async {
     if (title.text.isEmpty ||
         selectedDate == null ||
@@ -154,8 +148,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     Navigator.pop(context);
   }
 
-  // ================= UI =================
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,7 +172,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
             SizedBox(height: 12),
 
-            // 🎨 COLOR
             Row(
               children: [
                 Text("Color: "),
@@ -193,7 +184,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
             SizedBox(height: 12),
 
-            // 📅 DATE
             ListTile(
               title: Text("Date"),
               subtitle: Text(
@@ -204,7 +194,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
               trailing: TextButton(onPressed: pickDate, child: Text("Pick")),
             ),
 
-            // ⏰ START
             ListTile(
               title: Text("Start"),
               subtitle: Text(
@@ -216,7 +205,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
               ),
             ),
 
-            // ⏰ END
             ListTile(
               title: Text("End"),
               subtitle: Text(

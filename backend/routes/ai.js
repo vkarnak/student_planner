@@ -3,11 +3,9 @@ const router = express.Router();
 const db = require('../db');
 const auth = require('../middleware/authMiddleware');
 
-// разумные часы
 const START_HOUR = 9;
 const END_HOUR = 22;
 
-// утилита: свободные слоты на день
 function getFreeSlotsForDay(day, events) {
   const dayStart = new Date(day);
   dayStart.setHours(START_HOUR, 0, 0, 0);
@@ -42,7 +40,6 @@ function getFreeSlotsForDay(day, events) {
   return slots;
 }
 
-// приоритет: срочность + приоритет + сложность
 function taskScore(task) {
   const now = new Date();
   const deadline = new Date(task.deadline);

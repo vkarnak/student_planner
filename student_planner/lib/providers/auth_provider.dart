@@ -14,7 +14,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  // 🔐 LOGIN
   Future<bool> login(String email, String password) async {
     _setLoading(true);
     _error = null;
@@ -42,7 +41,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // 🔁 AUTO LOGIN
   Future<void> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final savedToken = prefs.getString('token');
@@ -54,7 +52,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // 📝 REGISTER
   Future<bool> register(String email, String password, String name) async {
     _setLoading(true);
     _error = null;
@@ -67,7 +64,6 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // 🔥 АВТОЛОГИН
       return await login(email, password);
     } catch (e) {
       _error = "Server error";
@@ -77,7 +73,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // 🚪 LOGOUT
   Future<void> logout() async {
     _token = null;
     ApiService.token = null;
@@ -88,7 +83,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 🔧 helper
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();

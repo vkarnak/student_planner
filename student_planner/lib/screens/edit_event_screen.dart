@@ -47,7 +47,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
     super.didChangeDependencies();
   }
 
-  // 📅 DATE
   Future<void> pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -61,7 +60,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
     }
   }
 
-  // ⏰ START
   Future<void> pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -73,7 +71,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
     }
   }
 
-  // ⏰ END
   Future<void> pickEndTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -138,8 +135,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
     Navigator.pop(context);
   }
 
-  // ================= UI =================
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,7 +157,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
               maxLines: 2,
             ),
 
-            // 📅 DATE
             ListTile(
               title: Text("Date"),
               subtitle: Text(
@@ -173,7 +167,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
               trailing: TextButton(onPressed: pickDate, child: Text("Pick")),
             ),
 
-            // ⏰ START
             ListTile(
               title: Text("Start"),
               subtitle: Text(
@@ -185,7 +178,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
               ),
             ),
 
-            // ⏰ END
             ListTile(
               title: Text("End"),
               subtitle: Text(

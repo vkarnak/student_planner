@@ -34,7 +34,6 @@ router.post('/', auth, (req, res) => {
   );
 });
 
-// ✏️ UPDATE TASK
 router.put('/:id', auth, (req, res) => {
   const t = req.body;
 

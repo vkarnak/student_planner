@@ -159,7 +159,6 @@ class ApiService {
     await http.delete(Uri.parse("$baseUrl/events/$id"), headers: headers);
   }
 
-  // 🧠 SUGGESTIONS
   static Future<List<dynamic>> getSuggestions() async {
     final res = await http.get(
       Uri.parse("$baseUrl/ai/suggestions"),
@@ -173,7 +172,6 @@ class ApiService {
     return [];
   }
 
-  // ⏰ DEADLINES
   static Future<List<dynamic>> getDeadlines() async {
     final res = await http.get(
       Uri.parse("$baseUrl/deadlines"),
@@ -196,7 +194,6 @@ class ApiService {
     return jsonDecode(res.body);
   }
 
-  // 🔥 UNIVERSAL GET
   static Future<List<dynamic>> get(String endpoint) async {
     final res = await http.get(
       Uri.parse("$baseUrl$endpoint"),
@@ -210,7 +207,6 @@ class ApiService {
     return [];
   }
 
-  // 🔥 UNIVERSAL POST
   static Future<List<dynamic>> post(String endpoint, Map data) async {
     final res = await http.post(
       Uri.parse("$baseUrl$endpoint"),

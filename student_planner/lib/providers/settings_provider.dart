@@ -11,7 +11,6 @@ class SettingsProvider with ChangeNotifier {
   UserSettings get settings => _settings;
   bool get isLoaded => _isLoaded;
 
-  // ================= LOAD =================
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString("settings");
@@ -24,13 +23,10 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= SAVE =================
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("settings", jsonEncode(_settings.toJson()));
   }
-
-  // ================= TOGGLES =================
 
   void toggleDailyPlan(bool value) {
     if (_settings.dailyPlan == value) return;

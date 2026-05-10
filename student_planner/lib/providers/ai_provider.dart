@@ -7,7 +7,7 @@ import '../services/ai_scheduler.dart';
 
 import 'task_provider.dart';
 import 'event_provider.dart';
-import 'settings_provider.dart'; // 👈 добавили
+import 'settings_provider.dart';
 
 class AiProvider with ChangeNotifier {
   List<Suggestion> _suggestions = [];
@@ -15,17 +15,16 @@ class AiProvider with ChangeNotifier {
 
   late TaskProvider _taskProvider;
   late EventProvider _eventProvider;
-  late SettingsProvider _settingsProvider; // 👈 добавили
+  late SettingsProvider _settingsProvider;
 
   Timer? _debounce;
   bool _isBound = false;
   bool _isGenerating = false;
 
-  /// 🔗 ПОДКЛЮЧЕНИЕ
   void bind(
     TaskProvider taskProvider,
     EventProvider eventProvider,
-    SettingsProvider settingsProvider, // 👈 добавили
+    SettingsProvider settingsProvider,
   ) {
     if (_isBound) return;
 
@@ -35,14 +34,13 @@ class AiProvider with ChangeNotifier {
 
     _taskProvider.addListener(_onDataChanged);
     _eventProvider.addListener(_onDataChanged);
-    _settingsProvider.addListener(_onDataChanged); // 👈 важно!
+    _settingsProvider.addListener(_onDataChanged);
 
     _isBound = true;
 
     _regenerate();
   }
 
-  /// 🔄 КОГДА ЧТО-ТО ИЗМЕНИЛОСЬ
   void _onDataChanged() {
     _debounce?.cancel();
 
@@ -51,19 +49,16 @@ class AiProvider with ChangeNotifier {
     });
   }
 
-  /// ❌ УДАЛЕНИЕ
   void removeSuggestion(Suggestion s) {
     _suggestions.remove(s);
     notifyListeners();
   }
 
-  /// 🧹 ОЧИСТКА
   void clear() {
     _suggestions = [];
     notifyListeners();
   }
 
-  /// 🧠 ПЕРЕСЧЁТ
   Future<void> _regenerate() async {
     if (_isGenerating) return;
 

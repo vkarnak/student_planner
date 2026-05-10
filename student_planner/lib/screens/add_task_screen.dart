@@ -23,7 +23,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String? error;
   bool isLoading = false;
 
-  // 📅 PICK DEADLINE
   Future<void> pickDeadline() async {
     final picked = await showDatePicker(
       context: context,
@@ -53,7 +52,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  // 🚀 CREATE TASK
   void createTask() async {
     if (title.text.isEmpty || selectedDeadline == null) {
       setState(() => error = "Fill all fields");
@@ -92,7 +90,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          // 📌 TITLE + DESCRIPTION
           Card(
             child: Padding(
               padding: EdgeInsets.all(16),
@@ -114,7 +111,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
           SizedBox(height: 10),
 
-          // 📅 DEADLINE
           Card(
             child: ListTile(
               title: Text("Deadline"),
@@ -130,7 +126,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           ),
 
-          // ⏱ DURATION
           Card(
             child: ListTile(
               title: Text("Duration"),
@@ -144,7 +139,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           ),
 
-          // ⚡ PRIORITY
           Card(
             child: ListTile(
               title: Text("Priority"),
@@ -161,7 +155,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           ),
 
-          // 🧠 DIFFICULTY
           Card(
             child: ListTile(
               title: Text("Difficulty"),

@@ -4,7 +4,6 @@ const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// 🔥 получить календарь (tasks + events)
 router.get('/', auth, (req, res) => {
 
   const userId = req.user.id;

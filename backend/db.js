@@ -4,10 +4,8 @@ const db = new sqlite3.Database('./db.sqlite');
 
 db.serialize(() => {
 
-  // 🔥 ВАЖНО: включаем foreign keys
   db.run("PRAGMA foreign_keys = ON");
 
-  // ================= USERS =================
   db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +14,6 @@ db.serialize(() => {
     name TEXT NOT NULL
   )`);
 
-  // ================= SCHEDULE =================
   db.run(`
   CREATE TABLE IF NOT EXISTS schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +24,6 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`);
 
-  // ================= TASKS =================
   db.run(`
   CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +40,6 @@ db.serialize(() => {
     FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE SET NULL
   )`);
 
-  // ================= EVENTS =================
   db.run(`
   CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +54,6 @@ db.serialize(() => {
     FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE SET NULL
   )`);
 
-  // ================= REMINDERS =================
   db.run(`
   CREATE TABLE IF NOT EXISTS reminders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

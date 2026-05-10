@@ -50,7 +50,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     super.didChangeDependencies();
   }
 
-  // 📅 дата
   Future<void> pickDeadline() async {
     final picked = await showDatePicker(
       context: context,
@@ -64,7 +63,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     }
   }
 
-  // ⏱ время
   Future<void> pickDuration() async {
     final picked = await showTimePicker(
       context: context,
@@ -81,7 +79,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     }
   }
 
-  // 💾 сохранить
   void save() async {
     if (title.text.isEmpty || selectedDeadline == null) {
       setState(() => error = "Fill all fields");

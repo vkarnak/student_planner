@@ -42,8 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // ================= FORMAT =================
-
   String formatTime(DateTime d) =>
       "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
 
@@ -88,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return d.isBefore(DateTime.now()) && task.status != "done";
   }
 
-  // ================= ITEMS =================
-
   List<dynamic> getItemsForDay(DateTime day) {
     final tasks = Provider.of<TaskProvider>(context, listen: false).tasks;
     final events = Provider.of<EventProvider>(context, listen: false).events;
@@ -110,8 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return [...dayTasks, ...dayEvents];
   }
-
-  // ================= COLORS =================
 
   Color getTaskColor(Task task) {
     switch (task.priority) {
@@ -258,7 +252,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
 
-        // ✅ ВОТ ОН — ВНУТРИ Stack
         Positioned(
           bottom: 12,
           right: 12,
@@ -458,7 +451,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ? SingleChildScrollView(
               child: Column(
                 children: [
-                  // 📅 CALENDAR
                   Padding(
                     padding: EdgeInsets.all(12),
                     child: SizedBox(
@@ -467,7 +459,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // 📊 ITEMS (день / все)
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: SizedBox(
@@ -498,14 +489,12 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           : Row(
               children: [
-                // ================= LEFT =================
                 Expanded(
                   flex: 2,
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        // ================= CALENDAR =================
                         Expanded(flex: 3, child: Card(child: _buildCalendar())),
                         SizedBox(height: 10),
                         Expanded(

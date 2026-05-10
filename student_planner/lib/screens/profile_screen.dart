@@ -35,7 +35,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     settings.load();
   }
 
-  // ================= SAVE =================
   void save() async {
     final provider = context.read<ProfileProvider>();
 
@@ -53,7 +52,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // ================= PASSWORD =================
   void changePassword() async {
     final success = await ApiService.changePassword(
       oldPassword.text,
@@ -65,7 +63,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // ================= LOGOUT =================
   Future<void> logout() async {
     final confirm = await showDialog(
       context: context,
@@ -91,8 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // ================= UI =================
-
   @override
   Widget build(BuildContext context) {
     final profile = context.watch<ProfileProvider>();
@@ -107,7 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // ================= PROFILE =================
                   Card(
                     child: Padding(
                       padding: EdgeInsets.all(16),
@@ -148,7 +142,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   SizedBox(height: 20),
 
-                  // ================= 🔔 NOTIFICATIONS =================
                   Card(
                     child: Column(
                       children: [
@@ -185,7 +178,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   SizedBox(height: 20),
 
-                  // ================= PASSWORD =================
                   Card(
                     child: Padding(
                       padding: EdgeInsets.all(16),
@@ -223,7 +215,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   SizedBox(height: 20),
 
-                  // ================= LOGOUT =================
                   Card(
                     child: ListTile(
                       leading: Icon(Icons.logout, color: Colors.red),
