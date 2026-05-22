@@ -48,7 +48,7 @@ class AiScheduler {
 
       int score = 0;
 
-      score += daysLeft * 10;
+      score += daysLeft * 20;
       score -= task.priority * 5;
       score -= dayLoadHours * 8;
 
@@ -65,70 +65,22 @@ class AiScheduler {
       return score;
     }
 
-    DateTime? tryPlace({
-      required Duration duration,
-      required DateTime deadline,
-      required Task task,
-    }) {
-      DateTime? bestSlot;
-      int bestScore = -999999;
-
-      for (int d = 0; d < 14; d++) {
-        final day = DateTime(now.year, now.month, now.day + d);
-
-        if (day.isAfter(deadline)) break;
-
-        final dayKey = DateTime(day.year, day.month, day.day);
-        final usedHours = dayLoad[dayKey] ?? 0;
-
-        if (usedHours + duration.inHours > 8) continue;
-
-        for (int h = 8; h < 22; h++) {
-          final start = DateTime(day.year, day.month, day.day, h);
-          final end = start.add(duration);
-
-          if (start.isBefore(now)) continue;
-          if (end.isAfter(deadline)) continue;
-          if (!isFree(start, end)) continue;
-
-          final score = scoreSlot(
-            start: start,
-            deadline: deadline,
-            task: task,
-            dayLoadHours: usedHours,
-          );
-
-          if (score > bestScore) {
-            bestScore = score;
-            bestSlot = start;
-          }
-        }
-      }
-
-      return bestSlot;
-    }
-
     for (var task in activeTasks) {
       final deadline = DateTime.parse(task.deadline!);
       final totalMinutes = task.duration ?? 60;
       final fullDuration = Duration(minutes: totalMinutes);
-      final singleSlot = tryPlace(
-        duration: fullDuration,
-        deadline: deadline,
-        task: task,
-      );
 
       List<Duration> chunks = [];
 
       final isOverdue = deadline.isBefore(now);
 
-      if (singleSlot != null || totalMinutes <= 3 || isOverdue) {
+      if (totalMinutes <= 60) {
         chunks = [fullDuration];
       } else {
         int remaining = totalMinutes ~/ 60;
 
         while (remaining > 0) {
-          int block = remaining >= 3 ? 2 : remaining;
+          int block = 1;
 
           if (block > remaining) block = remaining;
 
@@ -146,41 +98,77 @@ class AiScheduler {
 
         for (int d = 0; d < 14; d++) {
           final day = DateTime(now.year, now.month, now.day + d);
+          final isOverdue = deadline.isBefore(now);
 
-          if (day.isAfter(deadline)) break;
+          final deadlineDay = DateTime(
+            deadline.year,
+            deadline.month,
+            deadline.day,
+          );
+
+          if (!isOverdue && day.isAfter(deadlineDay)) break;
 
           final dayKey = DateTime(day.year, day.month, day.day);
           final usedHours = dayLoad[dayKey] ?? 0;
 
-          if (usedHours + partDuration.inHours > 8) continue;
+          //  if (usedHours + partDuration.inHours > 8) continue;
 
           for (int h = 8; h < 22; h++) {
-            final start = DateTime(day.year, day.month, day.day, h);
-            final end = start.add(partDuration);
+            for (int m = 0; m < 60; m += 30) {
+              final start = DateTime(day.year, day.month, day.day, h, m);
+              final end = start.add(partDuration);
 
-            if (start.isBefore(now)) continue;
-            if (end.isAfter(deadline)) continue;
-            if (!isFree(start, end)) continue;
+              if (end.hour > 22 || end.day != start.day) continue;
+              if (start.isBefore(now)) continue;
 
-            if (previousEnd != null && start.isBefore(previousEnd)) {
-              continue;
-            }
+              final isOverdue = deadline.isBefore(now);
 
-            final score = scoreSlot(
-              start: start,
-              deadline: deadline,
-              task: task,
-              dayLoadHours: usedHours,
-            );
+              final deadlineEnd = DateTime(
+                deadline.year,
+                deadline.month,
+                deadline.day,
+                23,
+                59,
+              );
 
-            if (score > bestScore) {
-              bestScore = score;
-              bestSlot = start;
+              if (!isOverdue && end.isAfter(deadlineEnd)) continue;
+              if (!isFree(start, end)) continue;
+
+              if (previousEnd != null && start.isBefore(previousEnd)) {
+                continue;
+              }
+
+              final score = scoreSlot(
+                start: start,
+                deadline: deadline,
+                task: task,
+                dayLoadHours: usedHours,
+              );
+
+              if (score > bestScore) {
+                bestScore = score;
+                bestSlot = start;
+              }
             }
           }
         }
 
-        final slot = bestSlot ?? DateTime(now.year, now.month, now.day + i, 9);
+        if (bestSlot == null) {
+          result.add(
+            Suggestion(
+              id: "${task.id}_$i",
+              taskId: task.id!,
+              title: isOverdue
+                  ? "!!! ${task.title} NO FREE TIME !!!"
+                  : "${task.title} (No free time available)",
+              start: deadline,
+              end: deadline,
+            ),
+          );
+          continue;
+        }
+
+        final slot = bestSlot;
 
         final dayKey = DateTime(slot.year, slot.month, slot.day);
         dayLoad[dayKey] = (dayLoad[dayKey] ?? 0) + partDuration.inHours;
@@ -189,10 +177,13 @@ class AiScheduler {
 
         result.add(
           Suggestion(
+            id: "${task.id}_$i",
             taskId: task.id!,
             title: chunks.length > 1
-                ? "${task.title} (часть ${i + 1})"
-                : task.title,
+                ? (isOverdue
+                      ? "!!! ${task.title} (part ${i + 1}) !!!"
+                      : "${task.title} (part ${i + 1})")
+                : (isOverdue ? "!!! ${task.title} !!!" : task.title),
             start: slot,
             end: slot.add(partDuration),
           ),
@@ -200,6 +191,7 @@ class AiScheduler {
       }
     }
 
+    result.sort((a, b) => a.start.compareTo(b.start));
     return result;
   }
 }

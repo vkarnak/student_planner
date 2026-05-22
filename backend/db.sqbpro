@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="db.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2825"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="tasks" custom_title="0" dock_id="1" table="4,5:maintasks"/><dock_state state="000000ff00000000fd0000000100000002000001ec00000212fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000000001ec0000012800ffffff000001ec0000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="events" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="117"/><column index="3" value="195"/><column index="4" value="195"/><column index="5" value="70"/><column index="6" value="52"/><column index="7" value="77"/><column index="8" value="39"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="reminders" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="33"/><column index="3" value="33"/><column index="4" value="52"/><column index="5" value="51"/><column index="6" value="59"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="schedules" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="33"/><column index="3" value="67"/><column index="4" value="61"/><column index="5" value="52"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="tasks" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="29"/><column index="2" value="78"/><column index="3" value="70"/><column index="4" value="187"/><column index="5" value="55"/><column index="6" value="49"/><column index="7" value="57"/><column index="8" value="62"/><column index="9" value="52"/><column index="10" value="77"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- =====================================================
+-- TASKS (MAY–JUNE 2026)
+-- =====================================================
+
+INSERT INTO tasks
+(user_id, title, description, deadline, duration, priority, difficulty, status)
+VALUES
+
+(1, 'Database Lab 4', 'Normalization and SQL joins', '2026-05-03T18:00:00', 120, 3, 2, 'done'),
+
+(1, 'Math Homework', 'Integrals practice', '2026-05-04T21:00:00', 90, 2, 2, 'done'),
+
+(1, 'Frontend Layout Fix', 'Responsive dashboard layout', '2026-05-05T23:00:00', 180, 3, 3, 'pending'),
+
+(1, 'Physics Report', 'Complete experiment report', '2026-05-06T20:00:00', 120, 2, 2, 'pending'),
+
+(1, 'Algorithms Homework', 'Dynamic programming tasks', '2026-05-07T22:00:00', 180, 4, 4, 'pending'),
+
+(1, 'Prepare Presentation', 'Software engineering slides', '2026-05-08T18:00:00', 150, 3, 3, 'done'),
+
+(1, 'Flutter Navigation Bug', 'Fix back navigation', '2026-05-09T23:00:00', 120, 3, 2, 'pending'),
+
+(1, 'English Essay', 'Technology in education', '2026-05-10T19:00:00', 90, 2, 2, 'done'),
+
+(1, 'Database Quiz Prep', 'Indexes and transactions', '2026-05-11T20:00:00', 120, 3, 2, 'pending'),
+
+(1, 'Write UML Diagrams', 'Update sequence diagrams', '2026-05-12T22:00:00', 180, 3, 3, 'pending'),
+
+(1, 'Fix API Validation', 'Backend auth fixes', '2026-05-13T23:00:00', 150, 4, 4, 'pending'),
+
+(1, 'Study Session', 'Review lecture notes', '2026-05-14T21:00:00', 90, 2, 2, 'done'),
+
+(1, 'Machine Learning Homework', 'Classification exercises', '2026-05-15T23:00:00', 210, 4, 4, 'pending'),
+
+(1, 'Prepare Thesis Outline', 'Draft report structure', '2026-05-16T20:00:00', 120, 3, 3, 'pending'),
+
+(1, 'Testing Session', 'Manual app testing', '2026-05-17T19:00:00', 90, 2, 2, 'done'),
+
+(1, 'Refactor Scheduler', 'Improve AI suggestions', '2026-05-18T23:30:00', 240, 4, 4, 'pending'),
+
+(1, 'Update README', 'Add setup instructions', '2026-05-19T18:00:00', 60, 1, 1, 'done'),
+
+(1, 'Fix Calendar UI', 'Correct overflow issues', '2026-05-20T22:00:00', 120, 3, 2, 'pending'),
+
+(1, 'Write Documentation', 'Architecture explanation', '2026-05-21T20:00:00', 150, 2, 2, 'pending'),
+
+(1, 'Prepare Demo', 'Polish application UI', '2026-05-22T23:00:00', 180, 4, 3, 'pending'),
+
+(1, 'Study Databases', 'Exam preparation', '2026-05-23T22:00:00', 240, 4, 4, 'pending'),
+
+(1, 'Fix Profile Screen', 'Improve spacing and design', '2026-05-24T20:00:00', 90, 2, 2, 'done'),
+
+(1, 'Responsive Testing', 'Desktop layout fixes', '2026-05-25T23:00:00', 180, 3, 3, 'pending'),
+
+(1, 'Write Conclusion', 'Final report conclusion', '2026-05-26T19:00:00', 90, 2, 2, 'pending'),
+
+(1, 'Prepare Defense Slides', 'Bachelor defense slides', '2026-05-27T22:00:00', 180, 4, 3, 'pending'),
+
+(1, 'Practice Speech', 'Defense rehearsal', '2026-05-28T20:00:00', 120, 3, 2, 'pending'),
+
+(1, 'Fix Last UI Bugs', 'Minor visual issues', '2026-05-29T21:00:00', 120, 2, 2, 'pending'),
+
+(1, 'Stress Testing', 'Large amount of tasks/events', '2026-05-30T22:00:00', 150, 3, 3, 'pending'),
+
+(1, 'Prepare Questions', 'Possible defense questions', '2026-05-31T18:00:00', 90, 2, 2, 'done'),
+
+(1, 'Final Report Check', 'Grammar and formatting', '2026-06-01T20:00:00', 120, 2, 2, 'pending'),
+
+(1, 'Database Exam Prep', 'Final database review', '2026-06-02T23:00:00', 240, 4, 4, 'pending'),
+
+(1, 'Fix Deployment Issues', 'Render deployment fixes', '2026-06-03T22:00:00', 180, 3, 3, 'pending'),
+
+(1, 'Backup Project', 'Save backup copies', '2026-06-04T17:00:00', 45, 1, 1, 'done'),
+
+(1, 'Prepare Final PDF', 'Export thesis PDF', '2026-06-05T21:00:00', 60, 3, 1, 'pending'),
+
+(1, 'Defense Checklist', 'Prepare documents', '2026-06-06T18:00:00', 45, 2, 1, 'pending'),
+
+(1, 'Final Rehearsal', 'Practice presentation timing', '2026-06-07T20:00:00', 120, 3, 2, 'pending'),
+
+(1, 'Bachelor Defense', 'Main defense preparation', '2026-06-08T08:00:00', 60, 5, 3, 'pending'),
+
+(1, 'Review Supervisor Notes', 'Correct remaining issues', '2026-06-09T19:00:00', 90, 2, 2, 'pending'),
+
+(1, 'Clean Repository', 'Remove temporary files', '2026-06-10T22:00:00', 60, 1, 1, 'done'),
+
+(1, 'Portfolio Update', 'Add bachelor project', '2026-06-11T20:00:00', 120, 2, 2, 'pending'),
+
+(1, 'Exam Preparation', 'Prepare for remaining exams', '2026-06-12T23:00:00', 210, 4, 4, 'pending'),
+
+(1, 'Documentation Cleanup', 'Reorganize appendices', '2026-06-13T21:00:00', 90, 2, 2, 'pending'),
+
+(1, 'Review Security Section', 'Auth and validation text', '2026-06-14T19:00:00', 90, 2, 2, 'done'),
+
+(1, 'Final UI Polish', 'Animations and hover effects', '2026-06-15T23:00:00', 180, 3, 3, 'pending'),
+
+(1, 'Prepare Archive', 'Zip project files', '2026-06-16T20:00:00', 60, 1, 1, 'pending'),
+
+(1, 'Update Screenshots', 'New screenshots for report', '2026-06-17T18:00:00', 60, 2, 1, 'pending'),
+
+(1, 'Post-Defense Cleanup', 'Organize semester files', '2026-06-18T20:00:00', 90, 1, 1, 'pending'),
+
+(1, 'Summer Internship Search', 'Browse вакансии', '2026-06-19T22:00:00', 120, 2, 2, 'pending'),
+
+(1, 'CV Update', 'Update resume after defense', '2026-06-20T18:00:00', 60, 1, 1, 'pending'),
+
+(1, 'GitHub Cleanup', 'Organize repositories', '2026-06-21T20:00:00', 90, 1, 1, 'pending'),
+
+(1, 'Semester Archive', 'Backup all university work', '2026-06-22T21:00:00', 60, 1, 1, 'pending');
+
+
+-- =====================================================
+-- EVENTS (MAY–JUNE 2026)
+-- =====================================================
+
+INSERT INTO events
+(user_id, title, start, end, description, color)
+VALUES
+
+(1, 'Math Lecture', '2026-05-03T10:00:00', '2026-05-03T11:30:00', 'Calculus lecture', 'blue'),
+
+(1, 'Gym', '2026-05-03T18:00:00', '2026-05-03T19:30:00', 'Workout', 'green'),
+
+(1, 'Database Lecture', '2026-05-04T12:00:00', '2026-05-04T13:30:00', 'Indexes and joins', 'blue'),
+
+(1, 'Work Shift', '2026-05-04T17:00:00', '2026-05-04T22:00:00', 'Cafe shift', 'orange'),
+
+(1, 'Project Meeting', '2026-05-05T15:00:00', '2026-05-05T16:30:00', 'Flutter discussion', 'green'),
+
+(1, 'Dentist Appointment', '2026-05-06T09:00:00', '2026-05-06T10:00:00', 'Routine appointment', 'red'),
+
+(1, 'Library Session', '2026-05-06T17:00:00', '2026-05-06T20:00:00', 'Study session', 'blue'),
+
+(1, 'Programming Lecture', '2026-05-07T11:00:00', '2026-05-07T12:30:00', 'Flutter widgets', 'blue'),
+
+(1, 'Coffee with Team', '2026-05-08T14:00:00', '2026-05-08T15:30:00', 'Group discussion', 'green'),
+
+(1, 'Night Study', '2026-05-08T21:00:00', '2026-05-08T23:30:00', 'Exam preparation', 'orange'),
+
+(1, 'AI Lecture', '2026-05-09T09:00:00', '2026-05-09T10:30:00', 'Machine learning basics', 'blue'),
+
+(1, 'Weekend Work', '2026-05-09T16:00:00', '2026-05-09T21:00:00', 'Part-time work', 'orange'),
+
+(1, 'Gym', '2026-05-10T18:00:00', '2026-05-10T19:30:00', 'Leg day', 'green'),
+
+(1, 'Consultation', '2026-05-11T13:00:00', '2026-05-11T14:00:00', 'Bachelor feedback', 'red'),
+
+(1, 'Frontend Workshop', '2026-05-12T10:00:00', '2026-05-12T12:00:00', 'Responsive UI', 'blue'),
+
+(1, 'Study Group', '2026-05-13T18:00:00', '2026-05-13T21:00:00', 'Algorithms revision', 'green'),
+
+(1, 'Database Quiz', '2026-05-14T09:00:00', '2026-05-14T11:00:00', 'Quiz', 'red'),
+
+(1, 'Movie Night', '2026-05-14T20:00:00', '2026-05-14T22:00:00', 'Relax evening', 'green'),
+
+(1, 'Presentation Day', '2026-05-15T14:00:00', '2026-05-15T16:00:00', 'Project presentation', 'red'),
+
+(1, 'Library Work', '2026-05-16T17:00:00', '2026-05-16T20:00:00', 'Documentation work', 'blue'),
+
+(1, 'Morning Run', '2026-05-17T07:30:00', '2026-05-17T08:30:00', 'Cardio', 'green'),
+
+(1, 'Team Meeting', '2026-05-18T13:00:00', '2026-05-18T15:00:00', 'Final report', 'green'),
+
+(1, 'Bachelor Consultation', '2026-05-19T12:00:00', '2026-05-19T13:00:00', 'Supervisor meeting', 'red'),
+
+(1, 'Exam Preparation', '2026-05-20T10:00:00', '2026-05-20T18:00:00', 'Study day', 'blue'),
+
+(1, 'Part-time Work', '2026-05-21T16:00:00', '2026-05-21T22:00:00', 'Weekend shift', 'orange'),
+
+(1, 'Meeting with Team', '2026-05-22T15:00:00', '2026-05-22T17:00:00', 'Testing discussion', 'green'),
+
+(1, 'Night Coding', '2026-05-23T20:00:00', '2026-05-24T00:00:00', 'Fixing bugs', 'orange'),
+
+(1, 'Gym', '2026-05-24T18:00:00', '2026-05-24T19:30:00', 'Workout', 'green'),
+
+(1, 'Report Review', '2026-05-25T13:00:00', '2026-05-25T14:30:00', 'Supervisor review', 'red'),
+
+(1, 'Study Session', '2026-05-26T17:00:00', '2026-05-26T21:00:00', 'Database exam prep', 'blue'),
+
+(1, 'Frontend Fixes', '2026-05-27T14:00:00', '2026-05-27T17:00:00', 'UI improvements', 'blue'),
+
+(1, 'Evening Walk', '2026-05-27T20:00:00', '2026-05-27T21:00:00', 'Relax', 'green'),
+
+(1, 'Mock Defense', '2026-05-28T11:00:00', '2026-05-28T13:00:00', 'Presentation practice', 'red'),
+
+(1, 'Coffee Break', '2026-05-29T15:00:00', '2026-05-29T16:00:00', 'Meet classmates', 'green'),
+
+(1, 'Debug Session', '2026-05-30T18:00:00', '2026-05-30T22:00:00', 'Fix final bugs', 'orange'),
+
+(1, 'Library Session', '2026-05-31T12:00:00', '2026-05-31T16:00:00', 'Final report edits', 'blue'),
+
+(1, 'Database Exam', '2026-06-01T09:00:00', '2026-06-01T12:00:00', 'Final exam', 'red'),
+
+(1, 'Gym', '2026-06-01T19:00:00', '2026-06-01T20:30:00', 'Workout', 'green'),
+
+(1, 'Defense Rehearsal', '2026-06-02T15:00:00', '2026-06-02T17:00:00', 'Practice', 'red'),
+
+(1, 'Project Cleanup', '2026-06-03T16:00:00', '2026-06-03T19:00:00', 'Code cleanup', 'blue'),
+
+(1, 'Night Study', '2026-06-03T21:00:00', '2026-06-04T00:00:00', 'Preparation', 'orange'),
+
+(1, 'Supervisor Meeting', '2026-06-04T11:00:00', '2026-06-04T12:00:00', 'Final corrections', 'red'),
+
+(1, 'Print Documents', '2026-06-05T13:00:00', '2026-06-05T14:00:00', 'Defense papers', 'green'),
+
+(1, 'Final Testing', '2026-06-06T18:00:00', '2026-06-06T22:00:00', 'App testing', 'blue'),
+
+(1, 'Defense Speech Practice', '2026-06-07T16:00:00', '2026-06-07T18:00:00', 'Rehearsal', 'green'),
+
+(1, 'Bachelor Defense', '2026-06-08T10:00:00', '2026-06-08T11:30:00', 'Defense presentation', 'red'),
+
+(1, 'Lunch with Group', '2026-06-08T13:00:00', '2026-06-08T15:00:00', 'Celebrate after defense', 'green'),
+
+(1, 'Relax Evening', '2026-06-08T20:00:00', '2026-06-08T22:30:00', 'Movies and games', 'orange'),
+
+(1, 'Support Classmates', '2026-06-09T09:00:00', '2026-06-09T12:00:00', 'Attend other defenses', 'red'),
+
+(1, 'Gym', '2026-06-09T18:00:00', '2026-06-09T19:30:00', 'Workout', 'green'),
+
+(1, 'Portfolio Update', '2026-06-10T15:00:00', '2026-06-10T17:00:00', 'Update portfolio', 'blue'),
+
+(1, 'Movie Night', '2026-06-10T20:00:00', '2026-06-10T22:00:00', 'Relax', 'orange'),
+
+(1, 'Exam Consultation', '2026-06-11T11:00:00', '2026-06-11T12:00:00', 'Consultation', 'red'),
+
+(1, 'Study Session', '2026-06-11T17:00:00', '2026-06-11T20:00:00', 'Exam preparation', 'blue'),
+
+(1, 'Weekend Work', '2026-06-12T16:00:00', '2026-06-12T22:00:00', 'Cafe shift', 'orange'),
+
+(1, 'Morning Run', '2026-06-13T08:00:00', '2026-06-13T09:00:00', 'Jogging', 'green'),
+
+(1, 'Dinner with Friends', '2026-06-13T19:00:00', '2026-06-13T22:00:00', 'Semester ending', 'orange'),
+
+(1, 'Library Session', '2026-06-14T12:00:00', '2026-06-14T16:00:00', 'Report fixes', 'blue'),
+
+(1, 'Consultation', '2026-06-15T13:00:00', '2026-06-15T14:00:00', 'Review comments', 'red'),
+
+(1, 'Study Group', '2026-06-15T17:00:00', '2026-06-15T20:00:00', 'Exam prep', 'green'),
+
+(1, 'Night Coding', '2026-06-16T21:00:00', '2026-06-17T00:00:00', 'Last fixes', 'orange'),
+
+(1, 'Exam Day', '2026-06-18T09:00:00', '2026-06-18T12:00:00', 'Final exam', 'red'),
+
+(1, 'Gaming Evening', '2026-06-18T19:00:00', '2026-06-18T23:00:00', 'Relax after exam', 'green'),
+
+(1, 'Final Submission', '2026-06-19T10:00:00', '2026-06-19T11:00:00', 'Upload documents', 'red'),
+
+(1, 'Shopping Trip', '2026-06-20T15:00:00', '2026-06-20T17:00:00', 'Buy summer clothes', 'green'),
+
+(1, 'Portfolio Work', '2026-06-21T16:00:00', '2026-06-21T18:00:00', 'CV update', 'blue'),
+
+(1, 'Vacation Planning', '2026-06-22T18:00:00', '2026-06-22T20:00:00', 'Summer plans', 'green');</sql><current_tab id="0"/></tab_sql></sqlb_project>

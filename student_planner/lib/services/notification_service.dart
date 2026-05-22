@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -19,6 +20,7 @@ class NotificationService {
   }
 
   static Future<void> init() async {
+    if (kIsWeb) return;
     tz.initializeTimeZones();
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -35,6 +37,7 @@ class NotificationService {
   }
 
   static Future<void> cancelAll() async {
+    if (kIsWeb) return;
     await _notifications.cancelAll();
   }
 
@@ -44,13 +47,17 @@ class NotificationService {
     required String body,
     required DateTime date,
   }) async {
+    if (kIsWeb) return;
     if (date.isBefore(DateTime.now())) return;
 
     await _notifications.zonedSchedule(
       id: id,
       title: title,
       body: body,
-      scheduledDate: tz.TZDateTime.from(date, tz.local),
+      scheduledDate: tz.TZDateTime.from(
+        DateTime.now().add(const Duration(seconds: 10)),
+        tz.local,
+      ),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'planner',
@@ -59,7 +66,7 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 
@@ -67,6 +74,7 @@ class NotificationService {
     List<Event> events,
     List<Suggestion> suggestions,
   ) async {
+    if (kIsWeb) return;
     final now = DateTime.now();
 
     final todayItems = [
@@ -102,16 +110,31 @@ class NotificationService {
   }
 
   static Future<void> scheduleDeadlines(List<Task> tasks) async {
+    if (kIsWeb) return;
     int id = 100;
 
     for (var t in tasks) {
+      if (t.status == "done") continue;
       if (t.deadlineDate == null) continue;
 
       final deadline = t.deadlineDate!;
 
+      final now = DateTime.now();
+
+      if (deadline.isBefore(now)) {
+        await _schedule(
+          id: id++,
+          title: "Deadline passed",
+          body: "${t.title} deadline has passed.",
+          date: now.add(const Duration(seconds: 5)),
+        );
+
+        continue;
+      }
+
       final notifyTime = deadline.subtract(const Duration(days: 1));
 
-      if (notifyTime.isBefore(DateTime.now())) continue;
+      if (notifyTime.isBefore(now)) continue;
 
       await _schedule(
         id: id++,
@@ -125,6 +148,7 @@ class NotificationService {
   static Future<void> scheduleAISuggestions(
     List<Suggestion> suggestions,
   ) async {
+    if (kIsWeb) return;
     final now = DateTime.now();
 
     final next = suggestions.where((s) => s.start.isAfter(now)).toList()
@@ -136,14 +160,15 @@ class NotificationService {
 
     final notifyTime = s.start.subtract(const Duration(minutes: 10));
 
-    if (notifyTime.hour < 8 || notifyTime.hour > 22) return;
+    if (notifyTime.hour < 8 || notifyTime.hour > 21) return;
 
     if (notifyTime.isBefore(now)) return;
 
     await _schedule(
       id: 200,
-      title: "AI Suggestion",
-      body: "At ${_time(s.start)} you can work on:\n${s.title}",
+      title: "Suggestion",
+      body:
+          "At ${_time(s.start)}, ${_date(s.start)} you can work on:\n${s.title}",
       date: notifyTime,
     );
   }
@@ -154,5 +179,9 @@ class NotificationService {
 
   static String _time(DateTime d) {
     return "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
+  }
+
+  static String _date(DateTime d) {
+    return "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
   }
 }

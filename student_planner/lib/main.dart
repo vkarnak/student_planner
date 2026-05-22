@@ -55,8 +55,9 @@ class MyApp extends StatelessWidget {
             title: 'Student Planner',
 
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
               useMaterial3: true,
+              fontFamily: 'Segoe UI',
             ),
 
             home: auth.token == null ? const LoginScreen() : const HomeScreen(),
@@ -73,7 +74,7 @@ class MyApp extends StatelessWidget {
               "/profile": (_) => ProfileScreen(),
             },
 
-            supportedLocales: const [Locale('ru', 'RU')],
+            supportedLocales: const [Locale('en', 'GB')],
             localizationsDelegates: GlobalMaterialLocalizations.delegates,
           );
         },

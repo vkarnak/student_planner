@@ -27,12 +27,25 @@ db.run(
 router.put('/:id', auth, (req, res) => {
   const e = req.body;
 
+  console.log("EVENT UPDATE BODY:", e);
+  console.log("EVENT ID:", req.params.id);
+  console.log("USER ID:", req.user.id);
+
 db.run(
   "UPDATE events SET title=?, start=?, end=?, description=?, color=? WHERE id=? AND user_id=?",
   [e.title, e.start, e.end, e.description, e.color, req.params.id, req.user.id],
-  function () {
+  function (err) {
+
+    if (err) {
+        console.log("SQL ERROR:", err);
+        return res.status(500).json({ error: err.message });
+      }
+
+      console.log("CHANGES:", this.changes);
+
     res.json({ changes: this.changes });
   }
+  
 );
 });
 

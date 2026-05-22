@@ -33,4 +33,20 @@ class TaskProvider extends ChangeNotifier {
     await TaskService.deleteTask(id);
     await loadTasks();
   }
+
+  Future<void> toggleDone(Task task) async {
+    final updated = Task(
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      deadline: task.deadline,
+      priority: task.priority,
+      duration: task.duration,
+      difficulty: task.difficulty,
+
+      status: task.status == "done" ? "active" : "done",
+    );
+
+    await updateTask(updated);
+  }
 }

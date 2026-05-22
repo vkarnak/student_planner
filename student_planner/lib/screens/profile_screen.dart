@@ -9,16 +9,20 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final name = TextEditingController();
   final email = TextEditingController();
+
   final oldPassword = TextEditingController();
   final newPassword = TextEditingController();
 
   String? error;
+
+  bool obscureOld = true;
+  bool obscureNew = true;
 
   @override
   void initState() {
@@ -35,6 +39,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
     settings.load();
   }
 
+  InputDecoration fieldDecoration({
+    required String hint,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+
+      prefixIcon: Icon(icon),
+
+      suffixIcon: suffixIcon,
+
+      filled: true,
+      fillColor: const Color(0xFFF8F9FF),
+
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: Colors.indigo.shade200),
+      ),
+
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Colors.indigo, width: 2),
+      ),
+    );
+  }
+
+  ButtonStyle primaryButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF4B5BD7),
+      foregroundColor: Colors.white,
+
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+
+      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+    );
+  }
+
+  Widget buildSection({required Widget child}) {
+    return Container(
+      width: double.infinity,
+
+      padding: const EdgeInsets.all(22),
+
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDFDFF),
+
+        borderRadius: BorderRadius.circular(24),
+
+        border: Border.all(color: Colors.black12),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+
+      child: child,
+    );
+  }
+
   void save() async {
     final provider = context.read<ProfileProvider>();
 
@@ -48,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (success) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Profile updated")));
+      ).showSnackBar(const SnackBar(content: Text("Profile updated")));
     }
   }
 
@@ -66,17 +134,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> logout() async {
     final confirm = await showDialog(
       context: context,
+
       builder: (_) => AlertDialog(
-        title: Text("Logout"),
-        content: Text("Are you sure?"),
+        title: const Text("Logout"),
+
+        content: const Text("Are you sure?"),
+
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text("Cancel"),
+
+            child: const Text("Cancel"),
           ),
+
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text("Logout"),
+
+            child: const Text("Logout"),
           ),
         ],
       ),
@@ -84,6 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (confirm == true) {
       await ApiService.logout();
+
       Navigator.pushNamedAndRemoveUntil(context, "/login", (_) => false);
     }
   }
@@ -91,140 +166,317 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profile = context.watch<ProfileProvider>();
+
     final settings = context.watch<SettingsProvider>();
 
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Profile")),
+      backgroundColor: const Color.fromARGB(255, 145, 159, 239),
 
-      body: profile.isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: name,
-                            decoration: InputDecoration(labelText: "Name"),
-                          ),
-                          SizedBox(height: 10),
-                          TextField(
-                            controller: email,
-                            decoration: InputDecoration(labelText: "Email"),
-                          ),
+      body: SafeArea(
+        child: profile.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
 
-                          if (error != null)
-                            Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child: Text(
-                                error!,
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 700),
 
-                          SizedBox(height: 15),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: save,
-                              child: Text("Save"),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 20),
-
-                  Card(
                     child: Column(
                       children: [
-                        ListTile(
-                          title: Text(
-                            "Notifications",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                        buildSection(
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+
+                                    borderRadius: BorderRadius.circular(14),
+
+                                    border: Border.all(color: Colors.black12),
+
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.03),
+                                        blurRadius: 3,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      size: 18,
+                                      color: Colors.black87,
+                                    ),
+
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              CircleAvatar(
+                                radius: 42,
+
+                                backgroundColor: const Color(0xFFEEF2FF),
+
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 42,
+                                  color: Color(0xFF4B5BD7),
+                                ),
+                              ),
+
+                              const SizedBox(height: 18),
+
+                              Text(
+                                "Profile",
+
+                                style: TextStyle(
+                                  fontSize: isMobile ? 30 : 38,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade900,
+                                ),
+                              ),
+
+                              const SizedBox(height: 28),
+
+                              TextField(
+                                controller: name,
+
+                                decoration: fieldDecoration(
+                                  hint: "Name",
+                                  icon: Icons.person_outline,
+                                ),
+                              ),
+
+                              const SizedBox(height: 18),
+
+                              TextField(
+                                controller: email,
+
+                                decoration: fieldDecoration(
+                                  hint: "Email",
+                                  icon: Icons.mail_outline,
+                                ),
+                              ),
+
+                              if (error != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+
+                                  child: Text(
+                                    error!,
+
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+
+                              const SizedBox(height: 22),
+
+                              SizedBox(
+                                width: double.infinity,
+                                height: isMobile ? 52 : 56,
+
+                                child: ElevatedButton(
+                                  onPressed: save,
+
+                                  style: primaryButtonStyle(),
+
+                                  child: const Text("Save"),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
-                        SwitchListTile(
-                          title: Text("Daily plan"),
-                          subtitle: Text("Morning schedule"),
-                          value: settings.settings.dailyPlan,
-                          onChanged: settings.toggleDailyPlan,
+                        const SizedBox(height: 20),
+
+                        buildSection(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+                              const Text(
+                                "Notifications",
+
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              SwitchListTile(
+                                contentPadding: EdgeInsets.zero,
+
+                                title: const Text("Daily plan"),
+
+                                subtitle: const Text("Morning schedule"),
+
+                                value: settings.settings.dailyPlan,
+
+                                onChanged: settings.toggleDailyPlan,
+                              ),
+
+                              SwitchListTile(
+                                contentPadding: EdgeInsets.zero,
+
+                                title: const Text("Deadlines"),
+
+                                subtitle: const Text("Remind before deadline"),
+
+                                value: settings.settings.deadlines,
+
+                                onChanged: settings.toggleDeadlines,
+                              ),
+
+                              SwitchListTile(
+                                contentPadding: EdgeInsets.zero,
+
+                                title: const Text("Suggestions"),
+
+                                subtitle: const Text("Planning suggestions"),
+
+                                value: settings.settings.aiSuggestions,
+
+                                onChanged: settings.toggleAi,
+                              ),
+                            ],
+                          ),
                         ),
 
-                        SwitchListTile(
-                          title: Text("Deadlines"),
-                          subtitle: Text("Remind before deadline"),
-                          value: settings.settings.deadlines,
-                          onChanged: settings.toggleDeadlines,
+                        const SizedBox(height: 20),
+
+                        buildSection(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+                              const Text(
+                                "Change Password",
+
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(height: 18),
+
+                              TextField(
+                                controller: oldPassword,
+
+                                obscureText: obscureOld,
+
+                                decoration: fieldDecoration(
+                                  hint: "Old password",
+                                  icon: Icons.lock_outline,
+
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscureOld
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                    ),
+
+                                    onPressed: () {
+                                      setState(() {
+                                        obscureOld = !obscureOld;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 18),
+
+                              TextField(
+                                controller: newPassword,
+
+                                obscureText: obscureNew,
+
+                                decoration: fieldDecoration(
+                                  hint: "New password",
+                                  icon: Icons.lock_outline,
+
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscureNew
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                    ),
+
+                                    onPressed: () {
+                                      setState(() {
+                                        obscureNew = !obscureNew;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 22),
+
+                              SizedBox(
+                                width: double.infinity,
+                                height: isMobile ? 52 : 56,
+
+                                child: ElevatedButton(
+                                  onPressed: changePassword,
+
+                                  style: primaryButtonStyle(),
+
+                                  child: const Text("Change Password"),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
-                        SwitchListTile(
-                          title: Text("AI suggestions"),
-                          subtitle: Text("Smart time suggestions"),
-                          value: settings.settings.aiSuggestions,
-                          onChanged: settings.toggleAi,
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: isMobile ? 52 : 56,
+
+                          child: ElevatedButton.icon(
+                            onPressed: logout,
+
+                            icon: const Icon(Icons.logout),
+
+                            label: const Text("Logout"),
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade50,
+
+                              foregroundColor: Colors.red,
+
+                              elevation: 0,
+
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-
-                  SizedBox(height: 20),
-
-                  Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: oldPassword,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: "Old password",
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextField(
-                            controller: newPassword,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: "New password",
-                            ),
-                          ),
-
-                          SizedBox(height: 15),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: changePassword,
-                              child: Text("Change password"),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 20),
-
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.logout, color: Colors.red),
-                      title: Text("Logout"),
-                      onTap: logout,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

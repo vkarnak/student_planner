@@ -6,14 +6,19 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
+  static const bool isLocal = true;
+
   static String get baseUrl {
-    if (kIsWeb) {
-      return "https://student-planner-16vd.onrender.com"; // 🌐 Web
-    } else if (Platform.isAndroid) {
-      return "https://student-planner-16vd.onrender.com"; // 🤖 Android emulator
-    } else {
-      return "https://student-planner-16vd.onrender.com"; // 💻 Windows / macOS
+    if (isLocal) {
+      if (kIsWeb) {
+        return "http://localhost:3000"; // 🌐 Web
+      } else if (Platform.isAndroid) {
+        return "http://10.0.2.2:3000"; // 🤖 Android emulator
+      } else {
+        return "http://localhost:3000"; // 💻 Windows
+      }
     }
+    return "https://student-planner-16vd.onrender.com"; // Production
   }
 
   static String? token;
@@ -23,7 +28,6 @@ class ApiService {
     if (token != null) "Authorization": "Bearer $token",
   };
 
-  // 👤 PROFILE
   static Future<Map<String, dynamic>?> getProfile() async {
     final res = await http.get(Uri.parse("$baseUrl/profile"), headers: headers);
 
@@ -90,7 +94,6 @@ class ApiService {
     await prefs.remove("token");
   }
 
-  // 📋 TASKS
   static Future<List<dynamic>> getTasks() async {
     final res = await http.get(Uri.parse("$baseUrl/tasks"), headers: headers);
 
@@ -121,7 +124,6 @@ class ApiService {
     await http.delete(Uri.parse("$baseUrl/tasks/$id"), headers: headers);
   }
 
-  // 📅 EVENTS
   static Future<List<dynamic>> getEvents() async {
     final res = await http.get(Uri.parse("$baseUrl/events"), headers: headers);
 
@@ -148,11 +150,14 @@ class ApiService {
   }
 
   static Future<void> updateEvent(Map data) async {
-    await http.put(
+    final res = await http.put(
       Uri.parse("$baseUrl/events/${data['id']}"),
       headers: headers,
       body: jsonEncode(data),
     );
+
+    print("UPDATE EVENT STATUS: ${res.statusCode}");
+    print("UPDATE EVENT BODY: ${res.body}");
   }
 
   static Future<void> deleteEvent(int id) async {

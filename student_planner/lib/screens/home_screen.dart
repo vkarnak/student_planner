@@ -12,7 +12,7 @@ import '../providers/ai_provider.dart';
 import '../models/task.dart';
 import '../models/event.dart';
 
-import '../widgets/task_tile.dart';
+//import '../widgets/task_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String formatTime(DateTime d) =>
       "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
 
-  String formatDate(DateTime d) => "${d.day}.${d.month}";
+  String formatDate(DateTime d) =>
+      "${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}";
 
   String monthName(int m) {
     const months = [
@@ -135,81 +136,190 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget buildInnerCard({required Widget child, VoidCallback? onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+
+      child: Material(
+        color: Colors.transparent,
+
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+
+          hoverColor: Colors.indigo.withOpacity(0.04),
+          splashColor: Colors.indigo.withOpacity(0.08),
+
+          onTap: onTap,
+
+          child: Ink(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDFDFF),
+
+              borderRadius: BorderRadius.circular(22),
+
+              border: Border.all(color: Colors.black12),
+
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCalendar() {
     return Stack(
       children: [
         Column(
           children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.chevron_left),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(
-                        _focusedDay.year,
-                        _focusedDay.month - 1,
-                      );
-                    });
-                  },
-                ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
 
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _focusedDay = DateTime.now();
-                      _selectedDay = DateTime.now();
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              child: Row(
+                children: [
+                  Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text("Today", style: TextStyle(color: Colors.blue)),
-                  ),
-                ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
 
-                Expanded(
-                  child: Center(
-                    child: InkWell(
-                      onTap: pickMonthYear,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "${monthName(_focusedDay.month)} ${_focusedDay.year}",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      border: Border.all(color: Colors.black12),
+                    ),
+
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_left_rounded),
+
+                      iconSize: 28,
+
+                      onPressed: () {
+                        setState(() {
+                          _focusedDay = DateTime(
+                            _focusedDay.year,
+                            _focusedDay.month - 1,
+                          );
+                        });
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: Center(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(18),
+
+                        onTap: pickMonthYear,
+
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 10,
                           ),
-                          Icon(Icons.arrow_drop_down),
-                        ],
+
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+
+                            borderRadius: BorderRadius.circular(18),
+
+                            border: Border.all(color: Colors.black12),
+                          ),
+
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+
+                            children: [
+                              Text(
+                                "${monthName(_focusedDay.month)} ${_focusedDay.year}",
+
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+
+                              const SizedBox(width: 6),
+
+                              const Icon(Icons.expand_more_rounded),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                IconButton(
-                  icon: Icon(Icons.chevron_right),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(
-                        _focusedDay.year,
-                        _focusedDay.month + 1,
-                      );
-                    });
-                  },
-                ),
-              ],
+                  const SizedBox(width: 12),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+
+                      border: Border.all(color: Colors.black12),
+                    ),
+
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_right_rounded),
+
+                      iconSize: 28,
+
+                      onPressed: () {
+                        setState(() {
+                          _focusedDay = DateTime(
+                            _focusedDay.year,
+                            _focusedDay.month + 1,
+                          );
+                        });
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEEF2FF),
+
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.today_rounded,
+                        color: Color(0xFF4B5BD7),
+                      ),
+
+                      onPressed: () {
+                        setState(() {
+                          _focusedDay = DateTime.now();
+                          _selectedDay = DateTime.now();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             Expanded(
               child: TableCalendar(
                 firstDay: DateTime.utc(1900),
-                lastDay: DateTime.utc(2500),
+                lastDay: DateTime.utc(2100),
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                availableGestures: AvailableGestures.horizontalSwipe,
+                rowHeight: 52,
+                daysOfWeekHeight: 28,
                 focusedDay: _focusedDay,
                 headerVisible: false,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -236,8 +346,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         return Container(
                           margin: EdgeInsets.symmetric(horizontal: 1),
-                          width: 10,
-                          height: 3,
+                          width: 14,
+                          height: 4,
                           decoration: BoxDecoration(
                             color: color,
                             borderRadius: BorderRadius.circular(2),
@@ -246,6 +356,45 @@ class _HomeScreenState extends State<HomeScreen> {
                       }).toList(),
                     );
                   },
+                ),
+                calendarStyle: CalendarStyle(
+                  outsideTextStyle: TextStyle(color: Colors.grey.shade400),
+                  defaultTextStyle: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  weekendTextStyle: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  selectedDecoration: const BoxDecoration(
+                    color: Color(0xFF4B5BD7),
+                    shape: BoxShape.circle,
+                  ),
+                  todayDecoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFF4B5BD7),
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  todayTextStyle: const TextStyle(
+                    color: Color(0xFF4B5BD7),
+                    fontWeight: FontWeight.w700,
+                  ),
+                  cellMargin: const EdgeInsets.all(6),
+                ),
+                daysOfWeekStyle: DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                  ),
+                  weekendStyle: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                  ),
                 ),
               ),
             ),
@@ -257,13 +406,25 @@ class _HomeScreenState extends State<HomeScreen> {
           right: 12,
           child: FloatingActionButton(
             mini: true,
+
+            backgroundColor: Colors.white,
+            foregroundColor: const Color(0xFF4B5BD7),
+
+            elevation: 2,
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: Colors.black12),
+            ),
+
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => AddEventScreen()),
               );
             },
-            child: Icon(Icons.add),
+
+            child: const Icon(Icons.add),
           ),
         ),
       ],
@@ -279,39 +440,164 @@ class _HomeScreenState extends State<HomeScreen> {
         if (item is Task) {
           final overdue = isOverdue(item);
 
-          return ListTile(
-            leading: Icon(
-              Icons.circle,
-              size: 10,
-              color: overdue ? Colors.red : getTaskColor(item),
+          return buildInnerCard(
+            onTap: () {
+              Navigator.pushNamed(context, "/edit", arguments: item);
+            },
+
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: overdue ? Colors.red : getTaskColor(item),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+
+                const SizedBox(width: 14),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+
+                          color: item.status == "done"
+                              ? Colors.black45
+                              : overdue
+                              ? Colors.red
+                              : Colors.black87,
+
+                          decoration: item.status == "done"
+                              ? TextDecoration.lineThrough
+                              : null,
+
+                          decorationThickness: 3,
+                          decorationColor: Colors.black54,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      if (item.deadline != null)
+                        Text(
+                          "Due: ${formatDate(DateTime.parse(item.deadline!))}",
+                          style: TextStyle(
+                            color: overdue ? Colors.red : Colors.grey.shade600,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+
+                      child: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+
+                        onPressed: () {
+                          Provider.of<TaskProvider>(
+                            context,
+                            listen: false,
+                          ).deleteTask(item.id!);
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    IconButton(
+                      icon: Icon(
+                        item.status == "done"
+                            ? Icons.check_circle
+                            : Icons.check_circle_outline,
+
+                        color: item.status == "done"
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+
+                      onPressed: () {
+                        Provider.of<TaskProvider>(
+                          context,
+                          listen: false,
+                        ).toggleDone(item);
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-            title: Text(
-              item.title,
-              style: TextStyle(
-                color: overdue ? Colors.red : null,
-                fontWeight: overdue ? FontWeight.bold : null,
-              ),
-            ),
-            subtitle: item.deadline != null
-                ? Text(formatDate(DateTime.parse(item.deadline!)))
-                : null,
           );
         }
 
         final e = item as Event;
 
-        return ListTile(
-          leading: Icon(Icons.calendar_today, color: getEventColor(e.color)),
-          title: Text(e.title),
-          subtitle: Text("${formatDate(e.start)} ${formatTime(e.start)}"),
-          onTap: () {
-            Navigator.pushNamed(context, "/edit_event", arguments: e);
+        return InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => {
+            Navigator.pushNamed(context, "/edit_event", arguments: e),
           },
-          trailing: IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              eventProvider.deleteEvent(e.id!);
-            },
+
+          child: buildInnerCard(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: getEventColor(e.color),
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        e.title,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "${formatDate(e.start)} "
+                        "${formatTime(e.start)}- ${formatTime(e.end)}",
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red, size: 22),
+                    onPressed: () {
+                      eventProvider.deleteEvent(e.id!);
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -321,12 +607,121 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTasks(TaskProvider taskProvider) {
     return Stack(
       children: [
-        Card(
-          margin: EdgeInsets.all(16),
+        Padding(
+          padding: const EdgeInsets.all(16),
+
           child: ListView.builder(
             itemCount: taskProvider.tasks.length,
+
             itemBuilder: (context, index) {
-              return TaskTile(taskProvider.tasks[index]);
+              final task = taskProvider.tasks[index];
+
+              final overdue = isOverdue(task);
+
+              return buildInnerCard(
+                onTap: () {
+                  Navigator.pushNamed(context, "/edit", arguments: task);
+                },
+
+                child: Row(
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+
+                      decoration: BoxDecoration(
+                        color: overdue ? Colors.red : getTaskColor(task),
+
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+
+                    const SizedBox(width: 14),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          Text(
+                            task.title,
+
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+
+                              color: task.status == "done"
+                                  ? Colors.black45
+                                  : overdue
+                                  ? Colors.red
+                                  : Colors.black87,
+
+                              decoration: task.status == "done"
+                                  ? TextDecoration.lineThrough
+                                  : null,
+
+                              decorationThickness: 3,
+                              decorationColor: Colors.black54,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          if (task.deadline != null)
+                            Text(
+                              "Due: ${formatDate(DateTime.parse(task.deadline!))}",
+
+                              style: TextStyle(
+                                color: overdue
+                                    ? Colors.red
+                                    : Colors.grey.shade600,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+
+                          child: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+
+                            onPressed: () {
+                              taskProvider.deleteTask(task.id!);
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        IconButton(
+                          icon: Icon(
+                            task.status == "done"
+                                ? Icons.check_circle
+                                : Icons.check_circle_outline,
+
+                            color: task.status == "done"
+                                ? Colors.green
+                                : Colors.grey,
+                          ),
+
+                          onPressed: () {
+                            taskProvider.toggleDone(task);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ),
@@ -334,15 +729,22 @@ class _HomeScreenState extends State<HomeScreen> {
         Positioned(
           bottom: 24,
           right: 24,
+
           child: FloatingActionButton(
             mini: true,
+
+            backgroundColor: const Color(0xFF4B5BD7),
+
+            foregroundColor: Colors.white,
+
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => AddTaskScreen()),
               );
             },
-            child: Icon(Icons.add),
+
+            child: const Icon(Icons.add),
           ),
         ),
       ],
@@ -358,59 +760,133 @@ class _HomeScreenState extends State<HomeScreen> {
       final task = taskProvider.tasks.any(
         (t) => t.title == s.title && t.status == "done",
       );
+
       return !task;
     }).toList();
 
     if (filtered.isEmpty) {
-      return Center(child: Text("💡 No suggestions"));
+      return const Center(
+        child: Text(
+          "💡 No suggestions",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      );
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+
       itemCount: filtered.length,
+
       itemBuilder: (context, index) {
         final s = filtered[index];
 
-        return ListTile(
-          leading: Icon(Icons.lightbulb, color: Colors.purple),
-          title: Text(s.title),
-          subtitle: Text("${formatDate(s.start)} ${formatTime(s.start)}"),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
+        final overdue = taskProvider.tasks.any((t) {
+          if (t.deadline == null) return false;
+          if (t.status == "done") return false;
+
+          final taskTitle = t.title.toLowerCase().trim();
+
+          final suggestionTitle = s.title.toLowerCase();
+
+          final related = suggestionTitle.contains(taskTitle);
+
+          if (!related) return false;
+
+          return DateTime.parse(t.deadline!).isBefore(DateTime.now());
+        });
+
+        return buildInnerCard(
+          onTap: () {
+            Navigator.pushNamed(context, "/edit_event", arguments: s);
+          },
+
+          child: Row(
             children: [
-              IconButton(
-                icon: Icon(Icons.add, color: Colors.green),
-                onPressed: () async {
-                  await eventProvider.addEvent(
-                    Event(
-                      title: s.title,
-                      start: s.start,
-                      end: s.end,
-                      color: "ai",
+              Icon(
+                Icons.lightbulb,
+                color: overdue ? Colors.red : Colors.purple,
+                size: 22,
+              ),
+
+              const SizedBox(width: 14),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    Text(
+                      s.title,
+
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+
+                        color: overdue ? Colors.red : Colors.black87,
+                      ),
                     ),
-                  );
-                  ai.removeSuggestion(s);
-                },
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      "${formatDate(s.start)} "
+                      "${formatTime(s.start)} - ${formatTime(s.end)}",
+
+                      style: TextStyle(
+                        color: overdue ? Colors.red : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  final event = Event(
-                    title: s.title,
-                    start: s.start,
-                    end: s.end,
-                    color: "ai",
-                  );
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
 
-                  Navigator.pushNamed(context, "/edit_event", arguments: event);
-                },
-              ),
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
 
-              IconButton(
-                icon: Icon(Icons.close, color: Colors.red),
-                onPressed: () {
-                  ai.removeSuggestion(s);
-                },
+                    child: IconButton(
+                      icon: const Icon(Icons.add, color: Colors.green),
+
+                      onPressed: () async {
+                        await eventProvider.addEvent(
+                          Event(
+                            title: s.title,
+                            start: s.start,
+                            end: s.end,
+                            color: "ai",
+                          ),
+                        );
+
+                        ai.removeSuggestion(s);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+
+                      onPressed: () {
+                        ai.removeSuggestion(s);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
             ],
           ),
@@ -435,14 +911,34 @@ class _HomeScreenState extends State<HomeScreen> {
         : getItemsForDay(_selectedDay!);
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 145, 159, 239),
+
       appBar: AppBar(
-        title: Text("Dashboard"),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+
+        title: const Text(
+          "Dashboard",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+            color: Colors.black87,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle),
-            onPressed: () {
-              Navigator.pushNamed(context, "/profile");
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: IconButton(
+              icon: Icon(
+                Icons.account_circle,
+                size: 34,
+                color: Color(0xFF4B5BD7),
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "/profile");
+              },
+            ),
           ),
         ],
       ),
@@ -471,7 +967,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.all(12),
                     child: SizedBox(
                       height: 300,
-                      child: _buildTasks(taskProvider),
+                      child: Card(child: _buildTasks(taskProvider)),
                     ),
                   ),
 

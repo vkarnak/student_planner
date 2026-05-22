@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/event_provider.dart';
+
 import '../models/event.dart';
+import '../providers/event_provider.dart';
 
 class AddEventScreen extends StatefulWidget {
   const AddEventScreen({super.key});
 
   @override
-  _AddEventScreenState createState() => _AddEventScreenState();
+  State<AddEventScreen> createState() => _AddEventScreenState();
 }
 
 class _AddEventScreenState extends State<AddEventScreen> {
@@ -71,21 +72,73 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  Widget _colorDot(String color) {
+  String formatDate(DateTime? date) {
+    if (date == null) return "Not selected";
+
+    return "${date.day.toString().padLeft(2, '0')}."
+        "${date.month.toString().padLeft(2, '0')}."
+        "${date.year}";
+  }
+
+  InputDecoration fieldDecoration({
+    required String hint,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+
+      prefixIcon: Icon(icon),
+
+      filled: true,
+      fillColor: const Color(0xFFF8F9FF),
+
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: Colors.indigo.shade200),
+      ),
+
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Colors.indigo, width: 2),
+      ),
+    );
+  }
+
+  Widget buildColorDot(String color) {
+    final isSelected = selectedColor == color;
+
     return GestureDetector(
       onTap: () {
-        setState(() => selectedColor = color);
+        setState(() {
+          selectedColor = color;
+        });
       },
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 6),
-        width: 22,
-        height: 22,
+
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+
+        width: isSelected ? 30 : 24,
+        height: isSelected ? 30 : 24,
+
         decoration: BoxDecoration(
           color: getEventColor(color),
           shape: BoxShape.circle,
-          border: selectedColor == color
-              ? Border.all(color: Colors.black, width: 2)
-              : null,
+
+          border: Border.all(
+            color: isSelected ? Colors.black87 : Colors.transparent,
+            width: 2,
+          ),
+
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: getEventColor(color).withOpacity(0.4),
+                    blurRadius: 8,
+                  ),
+                ]
+              : [],
         ),
       ),
     );
@@ -96,7 +149,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         selectedDate == null ||
         startTime == null ||
         endTime == null) {
-      setState(() => error = "Fill all fields");
+      setState(() => error = "Fill all required fields");
       return;
     }
 
@@ -117,7 +170,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
     );
 
     if (end.isBefore(start)) {
-      setState(() => error = "End time must be after start time");
+      setState(() {
+        error = "End time must be after start time";
+      });
+
       return;
     }
 
@@ -130,9 +186,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     final event = Event(
       title: title.text,
+      description: description.text,
       start: start,
       end: end,
-      description: description.text,
       color: selectedColor,
     );
 
@@ -150,81 +206,345 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 500;
+
     return Scaffold(
-      appBar: AppBar(title: Text("New Event")),
+      backgroundColor: const Color.fromARGB(255, 145, 159, 239),
 
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: title,
-              decoration: InputDecoration(labelText: "Title"),
-            ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
 
-            SizedBox(height: 10),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 650),
 
-            TextField(
-              controller: description,
-              decoration: InputDecoration(labelText: "Description"),
-              maxLines: 2,
-            ),
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                shadowColor: Colors.black26,
 
-            SizedBox(height: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
 
-            Row(
-              children: [
-                Text("Color: "),
-                _colorDot("blue"),
-                _colorDot("red"),
-                _colorDot("green"),
-                _colorDot("orange"),
-              ],
-            ),
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
 
-            SizedBox(height: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
 
-            ListTile(
-              title: Text("Date"),
-              subtitle: Text(
-                selectedDate == null
-                    ? "Not selected"
-                    : "${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}",
-              ),
-              trailing: TextButton(onPressed: pickDate, child: Text("Pick")),
-            ),
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
 
-            ListTile(
-              title: Text("Start"),
-              subtitle: Text(
-                startTime == null ? "Not selected" : startTime!.format(context),
-              ),
-              trailing: TextButton(
-                onPressed: pickStartTime,
-                child: Text("Pick"),
-              ),
-            ),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
 
-            ListTile(
-              title: Text("End"),
-              subtitle: Text(
-                endTime == null ? "Not selected" : endTime!.format(context),
-              ),
-              trailing: TextButton(onPressed: pickEndTime, child: Text("Pick")),
-            ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
 
-            SizedBox(height: 20),
+                            border: Border.all(color: Colors.black12),
 
-            if (error != null)
-              Text(error!, style: TextStyle(color: Colors.red)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
 
-            isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: createEvent,
-                    child: Text("Create Event"),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 18,
+                              color: Colors.black87,
+                            ),
+
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+
+                      Text(
+                        "Create Event",
+                        style: TextStyle(
+                          fontSize: isMobile ? 30 : 38,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade900,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      TextField(
+                        controller: title,
+
+                        decoration: fieldDecoration(
+                          hint: "Event title",
+                          icon: Icons.event_outlined,
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      TextField(
+                        controller: description,
+                        maxLines: 3,
+
+                        decoration: fieldDecoration(
+                          hint: "Description",
+                          icon: Icons.notes,
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
+
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8F9FF),
+
+                          borderRadius: BorderRadius.circular(20),
+
+                          border: Border.all(color: Colors.indigo.shade100),
+                        ),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+                            const Text(
+                              "Event Color",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+                                buildColorDot("blue"),
+                                buildColorDot("red"),
+                                buildColorDot("green"),
+                                buildColorDot("orange"),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FF),
+
+                                borderRadius: BorderRadius.circular(20),
+
+                                border: Border.all(
+                                  color: Colors.indigo.shade100,
+                                ),
+                              ),
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                children: [
+                                  const Text(
+                                    "Date",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 10),
+
+                                  Text(formatDate(selectedDate)),
+
+                                  const SizedBox(height: 14),
+
+                                  OutlinedButton.icon(
+                                    onPressed: pickDate,
+
+                                    icon: const Icon(
+                                      Icons.calendar_month_outlined,
+                                    ),
+
+                                    label: const Text("Select"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FF),
+
+                                borderRadius: BorderRadius.circular(20),
+
+                                border: Border.all(
+                                  color: Colors.indigo.shade100,
+                                ),
+                              ),
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                children: [
+                                  const Text(
+                                    "Start Time",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 10),
+
+                                  Text(
+                                    startTime == null
+                                        ? "Not selected"
+                                        : startTime!.format(context),
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  OutlinedButton.icon(
+                                    onPressed: pickStartTime,
+
+                                    icon: const Icon(Icons.schedule_outlined),
+
+                                    label: const Text("Select"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 14),
+
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FF),
+
+                                borderRadius: BorderRadius.circular(20),
+
+                                border: Border.all(
+                                  color: Colors.indigo.shade100,
+                                ),
+                              ),
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                children: [
+                                  const Text(
+                                    "End Time",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 10),
+
+                                  Text(
+                                    endTime == null
+                                        ? "Not selected"
+                                        : endTime!.format(context),
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  OutlinedButton.icon(
+                                    onPressed: pickEndTime,
+
+                                    icon: const Icon(Icons.schedule_outlined),
+
+                                    label: const Text("Select"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      if (error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+
+                          child: Text(
+                            error!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: isMobile ? 52 : 56,
+
+                        child: isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ElevatedButton(
+                                onPressed: createEvent,
+
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4B5BD7),
+
+                                  foregroundColor: Colors.white,
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+
+                                  textStyle: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+
+                                child: const Text("Create Event"),
+                              ),
+                      ),
+                    ],
                   ),
-          ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

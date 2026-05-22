@@ -28,6 +28,7 @@ class Event {
 
   Map<String, dynamic> toJson() {
     return {
+      "id": id,
       "title": title,
       "start": start.toIso8601String(),
       "end": end.toIso8601String(),

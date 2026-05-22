@@ -21,6 +21,8 @@ class AiProvider with ChangeNotifier {
   bool _isBound = false;
   bool _isGenerating = false;
 
+  final Map<String, DateTime> _manualSuggestions = {};
+
   void bind(
     TaskProvider taskProvider,
     EventProvider eventProvider,
@@ -54,6 +56,15 @@ class AiProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateSuggestion(
+    Suggestion oldSuggestion,
+    DateTime newStart,
+  ) async {
+    _manualSuggestions[oldSuggestion.id] = newStart;
+
+    await _regenerate();
+  }
+
   void clear() {
     _suggestions = [];
     notifyListeners();
@@ -69,6 +80,24 @@ class AiProvider with ChangeNotifier {
         _taskProvider.tasks,
         _eventProvider.events,
       );
+
+      for (int i = 0; i < newSuggestions.length; i++) {
+        final s = newSuggestions[i];
+
+        if (_manualSuggestions.containsKey(s.id)) {
+          final newStart = _manualSuggestions[s.id]!;
+
+          final duration = s.end.difference(s.start);
+
+          newSuggestions[i] = Suggestion(
+            id: s.id,
+            taskId: s.taskId,
+            title: s.title,
+            start: newStart,
+            end: newStart.add(duration),
+          );
+        }
+      }
 
       _suggestions = newSuggestions;
 
@@ -110,7 +139,7 @@ class AiProvider with ChangeNotifier {
     if (_isBound) {
       _taskProvider.removeListener(_onDataChanged);
       _eventProvider.removeListener(_onDataChanged);
-      _settingsProvider.removeListener(_onDataChanged); // 👈 важно
+      _settingsProvider.removeListener(_onDataChanged);
     }
 
     super.dispose();
