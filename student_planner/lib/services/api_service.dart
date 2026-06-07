@@ -6,7 +6,8 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const bool isLocal = true;
+  static const bool isLocal =
+      false; // Set to true for local development, false for production
 
   static String get baseUrl {
     if (isLocal) {
